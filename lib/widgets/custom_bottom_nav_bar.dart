@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
+import 'package:line_icons/line_icons.dart';
 import 'package:restaurant_app/utils/constants.dart';
 
 class CustomBottomNavBar extends StatelessWidget {
@@ -27,19 +28,19 @@ class CustomBottomNavBar extends StatelessWidget {
       backgroundColor: lightGreen,
       tabs: [
         GButton(
-          icon: Icons.home_outlined,
+          icon: LineIcons.home,
           text: 'Home',
         ),
         GButton(
-          icon: Icons.search_outlined,
+          icon: LineIcons.search,
           text: 'Search',
         ),
         GButton(
-          icon: Icons.bookmark_border_outlined,
+          icon: LineIcons.heart,
           text: 'Saved',
         ),
         GButton(
-          icon: Icons.person_outline,
+          icon: LineIcons.user,
           text: 'Profile',
         ),
       ],
