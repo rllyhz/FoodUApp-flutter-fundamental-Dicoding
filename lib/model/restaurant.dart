@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:restaurant_app/model/restaurant_menu.dart';
 
 class Restaurant {
@@ -27,4 +28,15 @@ class Restaurant {
     rating = json["rating"].toDouble();
     menus = RestaurantMenu.fromJson(json["menus"]);
   }
+}
+
+List<Restaurant> parseRestaurantData(String? json) {
+  if (json == null || json.isEmpty) {
+    return [];
+  }
+
+  final Map<String, dynamic> parsedData = jsonDecode(json);
+  return parsedData["restaurants"]
+      .map<Restaurant>((json) => Restaurant.fromJson(json))
+      .toList();
 }
