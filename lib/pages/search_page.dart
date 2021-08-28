@@ -40,7 +40,7 @@ class _SearchPageState extends State<SearchPage> {
       child: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12.0),
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
             child: TextField(
               controller: _controller,
               onChanged: _searchList,
