@@ -1,9 +1,8 @@
-import 'drink.dart';
-import 'food.dart';
+import 'menu_item.dart';
 
 class RestaurantMenu {
-  late List<Food> foods;
-  late List<Drink> drinks;
+  late List<MenuItem> foods;
+  late List<MenuItem> drinks;
 
   RestaurantMenu({
     required this.foods,
@@ -11,16 +10,16 @@ class RestaurantMenu {
   });
 
   RestaurantMenu.fromJson(Map<String, dynamic> json) {
-    foods = new List<Food>.empty(growable: true);
+    foods = new List<MenuItem>.empty(growable: true);
 
     json['foods'].forEach((v) {
-      foods.add(new Food.fromJson(v));
+      foods.add(new MenuItem.fromJson(v));
     });
 
-    drinks = new List<Drink>.empty(growable: true);
+    drinks = new List<MenuItem>.empty(growable: true);
 
     json['drinks'].forEach((v) {
-      drinks.add(new Drink.fromJson(v));
+      drinks.add(new MenuItem.fromJson(v));
     });
   }
 }
