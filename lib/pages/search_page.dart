@@ -3,12 +3,16 @@ import 'package:line_icons/line_icons.dart';
 import 'package:restaurant_app/model/restaurant.dart';
 import 'package:restaurant_app/pages/detail_restaurant_page.dart';
 import 'package:restaurant_app/utils/constants.dart';
+import 'package:restaurant_app/widgets/card_error.dart';
 import 'package:restaurant_app/widgets/card_item.dart';
 
 class SearchPage extends StatefulWidget {
   final List<Restaurant> restaurants;
+  final bool hasError;
 
-  const SearchPage({Key? key, required this.restaurants}) : super(key: key);
+  const SearchPage(
+      {Key? key, required this.restaurants, required this.hasError})
+      : super(key: key);
 
   @override
   _SearchPageState createState() => _SearchPageState();
@@ -65,7 +69,7 @@ class _SearchPageState extends State<SearchPage> {
             ),
           ),
           SizedBox(height: 20),
-          Expanded(
+          Flexible(
             child: _shouldListShown
                 ? ListView.builder(
                     padding: EdgeInsets.symmetric(horizontal: 12.0),
@@ -83,19 +87,30 @@ class _SearchPageState extends State<SearchPage> {
                   )
                 : Container(
                     child: Center(
-                      child: Column(
-                        children: [
-                          SizedBox(height: 56.0),
-                          Icon(LineIcons.mapMarked,
-                              size: 142.0, color: darkGreen.withOpacity(0.4)),
-                          Text('Explore your favorite restaurants with us.',
-                              style: TextStyle(
-                                  fontSize: 18.0,
-                                  fontWeight: FontWeight.bold,
-                                  color: darkGreen),
-                              textAlign: TextAlign.center)
-                        ],
-                      ),
+                      child: !widget.hasError
+                          ? Column(
+                              children: [
+                                SizedBox(height: 56.0),
+                                Icon(LineIcons.mapMarked,
+                                    size: 142.0,
+                                    color: darkGreen.withOpacity(0.4)),
+                                Text(
+                                    'Explore your favorite restaurants with us.',
+                                    style: TextStyle(
+                                        fontSize: 18.0,
+                                        fontWeight: FontWeight.bold,
+                                        color: darkGreen),
+                                    textAlign: TextAlign.center)
+                              ],
+                            )
+                          : Container(
+                              height: 120.0,
+                              margin: EdgeInsets.symmetric(horizontal: 12.0),
+                              child: CardError(
+                                label: cardErrorLabel,
+                                description: cardErrorDescription,
+                              ),
+                            ),
                     ),
                   ),
           ),
@@ -119,6 +134,8 @@ class _SearchPageState extends State<SearchPage> {
   }
 
   void _searchList(String query) {
+    if (widget.hasError) return;
+
     if (query.isEmpty) {
       setState(() {
         _tempData = widget.restaurants;

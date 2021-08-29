@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:line_icons/line_icons.dart';
 import 'package:restaurant_app/model/restaurant.dart';
@@ -7,7 +8,6 @@ import 'package:restaurant_app/pages/home_page.dart';
 import 'package:restaurant_app/pages/profile_page.dart';
 import 'package:restaurant_app/pages/search_page.dart';
 import 'package:restaurant_app/utils/constants.dart';
-
 import 'favorites_page.dart';
 
 class MainPage extends StatefulWidget {
@@ -24,6 +24,7 @@ class _MainPageState extends State<MainPage> {
   PageController? _controller;
   int _selectedIndex = 0;
   List<Restaurant> _restaurants = [];
+  bool _hasError = false;
 
   @override
   void initState() {
@@ -39,10 +40,21 @@ class _MainPageState extends State<MainPage> {
   }
 
   void _loadData() async {
-    String jsonData = await rootBundle.loadString('assets/restaurants.json');
-    setState(() {
+    try {
+      String jsonData = await rootBundle.loadString('assets/restaurants.json');
       _restaurants = parseRestaurantData(jsonData);
-    });
+      setState(() {});
+    } catch (e) {
+      _hasError = true;
+      setState(() {});
+
+      Fluttertoast.showToast(
+        msg: 'Failed to load data',
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.CENTER,
+        timeInSecForIosWeb: 1,
+      );
+    }
   }
 
   @override
@@ -61,8 +73,8 @@ class _MainPageState extends State<MainPage> {
         },
         physics: BouncingScrollPhysics(),
         children: [
-          HomePage(restaurants: _restaurants),
-          SearchPage(restaurants: _restaurants),
+          HomePage(restaurants: _restaurants, hasError: _hasError),
+          SearchPage(restaurants: _restaurants, hasError: _hasError),
           FavoritesPage(),
           ProfilePage(),
         ],

@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:restaurant_app/model/restaurant.dart';
+import 'package:restaurant_app/utils/constants.dart';
 import 'package:restaurant_app/utils/greeting_generator.dart';
+import 'package:restaurant_app/widgets/card_error.dart';
 import 'package:restaurant_app/widgets/card_item.dart';
 import 'detail_restaurant_page.dart';
 
 class HomePage extends StatelessWidget {
   final List<Restaurant> restaurants;
+  final bool hasError;
 
-  const HomePage({Key? key, required this.restaurants}) : super(key: key);
+  const HomePage({Key? key, required this.restaurants, required this.hasError})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -24,21 +28,26 @@ class HomePage extends StatelessWidget {
             SizedBox(height: 24.0),
             Text("Today's recommendations", style: TextStyle(fontSize: 18.0)),
             SizedBox(height: 12.0),
-            Expanded(
-              child: ListView.builder(
-                itemCount: restaurants.length,
-                itemBuilder: (ctx, index) {
-                  return CardItem(
-                    item: restaurants[index],
-                    onTapCallback: (restaurant) {
-                      Navigator.of(context).pushNamed(
-                          DetailRestaurantPage.route,
-                          arguments: restaurant);
-                    },
-                  );
-                },
-              ),
-            ),
+            !hasError
+                ? Flexible(
+                    child: ListView.builder(
+                      itemCount: restaurants.length,
+                      itemBuilder: (ctx, index) {
+                        return CardItem(
+                          item: restaurants[index],
+                          onTapCallback: (restaurant) {
+                            Navigator.of(context).pushNamed(
+                                DetailRestaurantPage.route,
+                                arguments: restaurant);
+                          },
+                        );
+                      },
+                    ),
+                  )
+                : CardError(
+                    label: cardErrorLabel,
+                    description: cardErrorDescription,
+                  ),
           ],
         ),
       ),

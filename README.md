@@ -1,16 +1,17 @@
 # restaurant_app
 
-A new Flutter project.
+Project for completing submission of Dicoding Fundamental Flutter's course.
 
-## Getting Started
+## Previews
 
-This project is a starting point for a Flutter application.
+Followings are the previews of the app:
 
-A few resources to get you started if this is your first Flutter project:
+<img width="40%" src="previews/splashscreen.png" />
 
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
+<img width="40%" src="previews/home_page.png" />
 
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+<img width="40%" src="previews/search_page.png" />
+
+<img width="40%" src="previews/favorites_page.png" />
+
+<img width="40%" src="previews/profile_page.png" />
