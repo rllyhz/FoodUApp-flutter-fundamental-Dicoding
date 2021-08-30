@@ -62,7 +62,7 @@ class SearchPage extends StatelessWidget {
               Container(
                 margin: EdgeInsets.symmetric(horizontal: 12.0),
                 child: CardError(
-                  height: 160.0,
+                  height: 138.0,
                   label: "Opps... Item not found!",
                   description:
                       "Data you're looking for could not be found. \nPlease make sure you type the correct query.",
