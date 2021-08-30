@@ -3,13 +3,19 @@ import 'package:flutter/material.dart';
 class CardError extends StatelessWidget {
   final String label;
   final String description;
+  final double height;
 
-  const CardError({Key? key, required this.label, required this.description})
+  CardError(
+      {Key? key,
+      required this.label,
+      required this.description,
+      this.height = 120.0})
       : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Container(
+      height: height,
       padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
       decoration: BoxDecoration(
         color: Colors.red.shade200,
