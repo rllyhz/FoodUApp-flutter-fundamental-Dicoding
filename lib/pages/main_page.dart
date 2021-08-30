@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:line_icons/line_icons.dart';
-import 'package:restaurant_app/model/restaurant.dart';
+import 'package:provider/provider.dart';
+import 'package:restaurant_app/api/api_service.dart';
 import 'package:restaurant_app/pages/home_page.dart';
 import 'package:restaurant_app/pages/profile_page.dart';
 import 'package:restaurant_app/pages/search_page.dart';
+import 'package:restaurant_app/provider/restaurant_provider.dart';
+import 'package:restaurant_app/provider/search_restaurants_provider.dart';
 import 'package:restaurant_app/utils/constants.dart';
 import 'favorites_page.dart';
 
@@ -23,38 +24,17 @@ class MainPage extends StatefulWidget {
 class _MainPageState extends State<MainPage> {
   PageController? _controller;
   int _selectedIndex = 0;
-  List<Restaurant> _restaurants = [];
-  bool _hasError = false;
 
   @override
   void initState() {
     super.initState();
     _controller = PageController(initialPage: 0);
-    _loadData();
   }
 
   @override
   void dispose() {
     _controller?.dispose();
     super.dispose();
-  }
-
-  void _loadData() async {
-    try {
-      String jsonData = await rootBundle.loadString('assets/restaurants.json');
-      _restaurants = parseRestaurantData(jsonData);
-      setState(() {});
-    } catch (e) {
-      _hasError = true;
-      setState(() {});
-
-      Fluttertoast.showToast(
-        msg: 'Failed to load data',
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.CENTER,
-        timeInSecForIosWeb: 1,
-      );
-    }
   }
 
   @override
@@ -73,8 +53,14 @@ class _MainPageState extends State<MainPage> {
         },
         physics: BouncingScrollPhysics(),
         children: [
-          HomePage(restaurants: _restaurants, hasError: _hasError),
-          SearchPage(restaurants: _restaurants, hasError: _hasError),
+          ChangeNotifierProvider<RestaurantProvider>(
+            create: (_) => RestaurantProvider(apiService: ApiService()),
+            child: HomePage(),
+          ),
+          ChangeNotifierProvider<SearchRestaurantsProvider>(
+            create: (_) => SearchRestaurantsProvider(apiService: ApiService()),
+            child: SearchPage(),
+          ),
           FavoritesPage(),
           ProfilePage(),
         ],

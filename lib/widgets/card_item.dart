@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:line_icons/line_icons.dart';
-import 'package:restaurant_app/model/restaurant.dart';
+import 'package:restaurant_app/api/api_service.dart';
+import 'package:restaurant_app/data/model/restaurant.dart';
 import 'package:restaurant_app/utils/constants.dart';
 
 class CardItem extends StatefulWidget {
-  final Restaurant item;
-  final Function(Restaurant) onTapCallback;
+  final RestaurantModel item;
+  final Function(RestaurantModel) onTapCallback;
 
   const CardItem({Key? key, required this.item, required this.onTapCallback})
       : super(key: key);
@@ -34,7 +35,8 @@ class _CardItemState extends State<CardItem> {
                   Hero(
                     tag: widget.item.id,
                     child: Image.network(
-                      widget.item.pictureId,
+                      ApiService.pictureMediumSizeBaseUrl +
+                          widget.item.pictureId,
                       width: MediaQuery.of(context).size.width,
                     ),
                   ),
@@ -68,7 +70,10 @@ class _CardItemState extends State<CardItem> {
                   Expanded(
                       child: CircleAvatar(
                         backgroundColor: darkGreen,
-                        backgroundImage: NetworkImage(widget.item.pictureId),
+                        backgroundImage: NetworkImage(
+                          ApiService.pictureSmallSizeBaseUrl +
+                              widget.item.pictureId,
+                        ),
                       ),
                       flex: 1),
                   SizedBox(width: 12.0),
