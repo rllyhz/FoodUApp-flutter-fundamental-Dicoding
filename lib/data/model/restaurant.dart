@@ -13,7 +13,7 @@ class RestaurantModel {
   late double rating;
   late String? address;
   late RestaurantMenu? menus;
-  late MenuItem? category;
+  late List<MenuItem>? categories;
   late List<RestaurantReview>? reviews;
 
   RestaurantModel(
@@ -25,7 +25,7 @@ class RestaurantModel {
       required this.rating,
       required this.address,
       required this.menus,
-      required this.category,
+      required this.categories,
       required this.reviews});
 
   factory RestaurantModel.fromJson(Map<String, dynamic> json) =>
@@ -38,7 +38,7 @@ class RestaurantModel {
         rating: json["rating"].toDouble(),
         address: json['address'],
         menus: RestaurantMenu.fromJson(json["menus"]),
-        category: MenuItem.fromJson(json['category']),
+        categories: List<MenuItem>.from(json['categories']).toList(),
         reviews: List<RestaurantReview>.from(
             json["customerReviews"].map((x) => RestaurantReview.fromJson(x))),
       );
