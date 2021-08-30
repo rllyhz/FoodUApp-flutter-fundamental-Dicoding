@@ -29,7 +29,7 @@ class DetailRestaurantProvider extends ChangeNotifier {
   }
 
   ScrollController _controller = ScrollController();
-  ScrollController get inputController => _controller;
+  ScrollController get scrollController => _controller;
 
   bool _isFav = false;
   bool get isFav => _isFav;
