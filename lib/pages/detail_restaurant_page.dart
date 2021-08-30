@@ -189,7 +189,6 @@ class DetailRestaurantPage extends StatelessWidget {
             SizedBox(height: 12.0),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12.0),
-              height: 180.0,
               child: _buildMenuOptions(context, provider),
             ),
             SizedBox(height: 26.0),
@@ -203,7 +202,6 @@ class DetailRestaurantPage extends StatelessWidget {
             SizedBox(height: 12.0),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12.0),
-              height: 250.0,
               child: _buildReviewsUI(context, provider),
             ),
           ]),
@@ -215,8 +213,11 @@ class DetailRestaurantPage extends StatelessWidget {
   Widget _buildMenuOptions(
       BuildContext context, DetailRestaurantProvider provider) {
     if (provider.state == ResultState.Loading) {
-      return Center(
-        child: CircularProgressIndicator(),
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 24.0),
+        child: Center(
+          child: CircularProgressIndicator(),
+        ),
       );
     } else if (provider.state == ResultState.HasData) {
       return ListView.builder(
@@ -224,6 +225,8 @@ class DetailRestaurantPage extends StatelessWidget {
             ? provider.detailRestaurant.restaurant.menus.foods.length
             : provider.detailRestaurant.restaurant.menus.drinks.length,
         controller: provider.scrollController,
+        physics: ClampingScrollPhysics(),
+        shrinkWrap: true,
         itemBuilder: (ctx, index) {
           return Container(
             padding: EdgeInsets.all(8.0),
@@ -274,8 +277,11 @@ class DetailRestaurantPage extends StatelessWidget {
 
 _buildReviewsUI(BuildContext context, DetailRestaurantProvider provider) {
   if (provider.state == ResultState.Loading) {
-    return Center(
-      child: CircularProgressIndicator(),
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 24.0),
+      child: Center(
+        child: CircularProgressIndicator(),
+      ),
     );
   }
 
@@ -292,12 +298,17 @@ _buildReviewsUI(BuildContext context, DetailRestaurantProvider provider) {
 
   return ListView.builder(
     physics: ClampingScrollPhysics(),
+    shrinkWrap: true,
     itemCount: restaurant.customerReviews.length,
     itemBuilder: (ctx, index) {
       final review = restaurant.customerReviews[index];
 
       return Padding(
-        padding: EdgeInsets.only(left: index % 2 == 0 ? 0 : 18.0, bottom: 4.0),
+        padding: EdgeInsets.only(
+          left: index % 2 == 0 ? 0 : 42.0,
+          right: index % 2 == 0 ? 42.0 : 0,
+          bottom: 4.0,
+        ),
         child: Card(
           child: Padding(
             padding: EdgeInsets.all(12.0),
