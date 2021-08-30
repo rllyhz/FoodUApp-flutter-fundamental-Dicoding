@@ -16,9 +16,9 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
+    return SingleChildScrollView(
+      physics: ClampingScrollPhysics(),
       child: Container(
-        height: double.maxFinite,
         padding: EdgeInsets.symmetric(horizontal: 16.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
@@ -29,42 +29,42 @@ class HomePage extends StatelessWidget {
             SizedBox(height: 24.0),
             Text("Today's recommendations", style: TextStyle(fontSize: 18.0)),
             SizedBox(height: 12.0),
-            Flexible(
-              child: Consumer<RestaurantProvider>(
-                builder: (ctx, provider, _) {
-                  if (provider.state == ResultState.Loading) {
-                    return Container(
-                      margin: EdgeInsets.only(top: 120.0),
-                      child: LoadingFeedback(
-                        text: "Preparing recommendation items for you...",
-                      ),
-                    );
-                  } else if (provider.state == ResultState.Error) {
-                    return CardError(
-                      label: cardErrorLabel,
-                      description: cardErrorDescription,
-                    );
-                  } else {
-                    final restaurants = provider.results.restaurants;
-                    return ListView.builder(
-                      itemCount: restaurants.length,
-                      itemBuilder: (ctx, index) {
-                        final item =
-                            restaurantItemToRestaurantModel(restaurants[index]);
+            Consumer<RestaurantProvider>(
+              builder: (ctx, provider, _) {
+                if (provider.state == ResultState.Loading) {
+                  return Container(
+                    margin: EdgeInsets.only(top: 120.0),
+                    child: LoadingFeedback(
+                      text: "Preparing recommendation items for you...",
+                    ),
+                  );
+                } else if (provider.state == ResultState.Error) {
+                  return CardError(
+                    label: cardErrorLabel,
+                    description: cardErrorDescription,
+                  );
+                } else {
+                  final restaurants = provider.results.restaurants;
+                  return ListView.builder(
+                    itemCount: restaurants.length,
+                    shrinkWrap: true,
+                    physics: ClampingScrollPhysics(),
+                    itemBuilder: (ctx, index) {
+                      final item =
+                          restaurantItemToRestaurantModel(restaurants[index]);
 
-                        return CardItem(
-                          item: item,
-                          onTapCallback: (restaurant) {
-                            Navigator.of(context).pushNamed(
-                                DetailRestaurantPage.route,
-                                arguments: restaurant);
-                          },
-                        );
-                      },
-                    );
-                  }
-                },
-              ),
+                      return CardItem(
+                        item: item,
+                        onTapCallback: (restaurant) {
+                          Navigator.of(context).pushNamed(
+                              DetailRestaurantPage.route,
+                              arguments: restaurant);
+                        },
+                      );
+                    },
+                  );
+                }
+              },
             ),
           ],
         ),
