@@ -1,17 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:restaurant_app/model/restaurant.dart';
+import 'package:provider/provider.dart';
+import 'package:restaurant_app/api/api_service.dart';
+import 'package:restaurant_app/provider/restaurant_provider.dart';
 import 'package:restaurant_app/utils/constants.dart';
 import 'package:restaurant_app/utils/greeting_generator.dart';
+import 'package:restaurant_app/utils/model_converter.dart';
 import 'package:restaurant_app/widgets/card_error.dart';
 import 'package:restaurant_app/widgets/card_item.dart';
+import 'package:restaurant_app/widgets/loading_feedback.dart';
+
 import 'detail_restaurant_page.dart';
 
 class HomePage extends StatelessWidget {
-  final List<Restaurant> restaurants;
-  final bool hasError;
-
-  const HomePage({Key? key, required this.restaurants, required this.hasError})
-      : super(key: key);
+  const HomePage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -28,13 +29,31 @@ class HomePage extends StatelessWidget {
             SizedBox(height: 24.0),
             Text("Today's recommendations", style: TextStyle(fontSize: 18.0)),
             SizedBox(height: 12.0),
-            !hasError
-                ? Flexible(
-                    child: ListView.builder(
+            Flexible(
+              child: Consumer<RestaurantProvider>(
+                builder: (ctx, provider, _) {
+                  if (provider.state == ResultState.Loading) {
+                    return Container(
+                      margin: EdgeInsets.only(top: 120.0),
+                      child: LoadingFeedback(
+                        text: "Preparing recommendation items for you...",
+                      ),
+                    );
+                  } else if (provider.state == ResultState.Error) {
+                    return CardError(
+                      label: cardErrorLabel,
+                      description: cardErrorDescription,
+                    );
+                  } else {
+                    final restaurants = provider.results.restaurants;
+                    return ListView.builder(
                       itemCount: restaurants.length,
                       itemBuilder: (ctx, index) {
+                        final item =
+                            restaurantItemToRestaurantModel(restaurants[index]);
+
                         return CardItem(
-                          item: restaurants[index],
+                          item: item,
                           onTapCallback: (restaurant) {
                             Navigator.of(context).pushNamed(
                                 DetailRestaurantPage.route,
@@ -42,12 +61,11 @@ class HomePage extends StatelessWidget {
                           },
                         );
                       },
-                    ),
-                  )
-                : CardError(
-                    label: cardErrorLabel,
-                    description: cardErrorDescription,
-                  ),
+                    );
+                  }
+                },
+              ),
+            ),
           ],
         ),
       ),

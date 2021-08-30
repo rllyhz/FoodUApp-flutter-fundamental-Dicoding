@@ -14,11 +14,19 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
+  bool _visible = false;
+
   @override
   void initState() {
     super.initState();
 
-    Timer(Duration(seconds: 3), () {
+    Timer(Duration(milliseconds: 1500), () {
+      setState(() {
+        _visible = true;
+      });
+    });
+
+    Timer(Duration(milliseconds: 3500), () {
       Navigator.of(context).pushReplacementNamed(MainPage.route);
     });
   }
@@ -28,24 +36,28 @@ class _SplashScreenState extends State<SplashScreen> {
     return Scaffold(
       backgroundColor: lightGreen,
       body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            SizedBox(
-              width: 120.0,
-              height: 120.0,
-              child: SvgPicture.asset(
-                'assets/pizza_logo.svg',
-                color: darkGreen,
-              ),
-            ),
-            Text('Restaurant App',
-                style: TextStyle(
+        child: AnimatedOpacity(
+          duration: Duration(milliseconds: 800),
+          opacity: _visible ? 1.0 : 0.0,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              SizedBox(
+                width: 120.0,
+                height: 120.0,
+                child: SvgPicture.asset(
+                  'assets/pizza_logo.svg',
                   color: darkGreen,
-                  fontSize: 24.0,
-                  fontWeight: FontWeight.w700,
-                )),
-          ],
+                ),
+              ),
+              Text('Restaurant App',
+                  style: TextStyle(
+                    color: darkGreen,
+                    fontSize: 24.0,
+                    fontWeight: FontWeight.w700,
+                  )),
+            ],
+          ),
         ),
       ),
     );

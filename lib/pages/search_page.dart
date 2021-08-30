@@ -1,167 +1,152 @@
 import 'package:flutter/material.dart';
 import 'package:line_icons/line_icons.dart';
-import 'package:restaurant_app/model/restaurant.dart';
+import 'package:provider/provider.dart';
+import 'package:restaurant_app/api/api_service.dart';
 import 'package:restaurant_app/pages/detail_restaurant_page.dart';
+import 'package:restaurant_app/provider/search_restaurants_provider.dart';
 import 'package:restaurant_app/utils/constants.dart';
+import 'package:restaurant_app/utils/model_converter.dart';
 import 'package:restaurant_app/widgets/card_error.dart';
 import 'package:restaurant_app/widgets/card_item.dart';
+import 'package:restaurant_app/widgets/loading_feedback.dart';
 
-class SearchPage extends StatefulWidget {
-  final List<Restaurant> restaurants;
-  final bool hasError;
+class SearchPage extends StatelessWidget {
+  SearchPage({Key? key}) : super(key: key);
 
-  const SearchPage(
-      {Key? key, required this.restaurants, required this.hasError})
-      : super(key: key);
-
-  @override
-  _SearchPageState createState() => _SearchPageState();
-}
-
-class _SearchPageState extends State<SearchPage> {
-  final TextEditingController _controller = TextEditingController();
-  List<Restaurant> _tempData = [];
-  bool _shouldListShown = false;
-  bool _shouldEmptyListShown = false;
-
-  @override
-  void initState() {
-    _controller.text = '';
-    _tempData = widget.restaurants;
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
+  void _searchList(String query, SearchRestaurantsProvider provider) {
+    if (query.isEmpty) return provider.setState(ResultState.Empty);
+    provider.searchRestaurants(query);
   }
 
   @override
   Widget build(BuildContext context) {
     return Container(
       width: MediaQuery.of(context).size.width,
-      child: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: TextField(
-              controller: _controller,
-              onChanged: _searchList,
-              onSubmitted: _searchList,
-              decoration: InputDecoration(
-                  border: UnderlineInputBorder(
-                    borderSide: BorderSide(
-                      color: darkGreen,
+      child: Consumer<SearchRestaurantsProvider>(
+        builder: (ctx, provider, _) {
+          if (provider.state == ResultState.Empty) {
+            return _buildSearchableListUI(
+              context,
+              provider,
+              Column(
+                children: [
+                  SizedBox(height: 56.0),
+                  Icon(LineIcons.mapMarked,
+                      size: 142.0, color: darkGreen.withOpacity(0.4)),
+                  Text('Explore your favorite restaurants with us.',
+                      style: TextStyle(
+                          fontSize: 18.0,
+                          fontWeight: FontWeight.bold,
+                          color: darkGreen),
+                      textAlign: TextAlign.center)
+                ],
+              ),
+            );
+          } else if (provider.state == ResultState.Loading) {
+            return _buildSearchableListUI(
+              context,
+              provider,
+              Container(
+                margin: EdgeInsets.only(top: 42.0),
+                child: Center(
+                  child: LoadingFeedback(
+                    text: "Finding what you're looking for...",
+                  ),
+                ),
+              ),
+            );
+          } else if (provider.state == ResultState.NoData) {
+            return _buildSearchableListUI(
+              context,
+              provider,
+              Container(
+                margin: EdgeInsets.symmetric(horizontal: 12.0),
+                child: CardError(
+                  height: 160.0,
+                  label: "Opps... Item not found!",
+                  description:
+                      "Data you're looking for could not be found. \nPlease make sure you type the correct query.",
+                ),
+              ),
+            );
+          } else if (provider.state == ResultState.Error) {
+            return _buildSearchableListUI(
+              context,
+              provider,
+              Container(
+                margin: EdgeInsets.symmetric(horizontal: 12.0),
+                child: CardError(
+                  label: cardErrorLabel,
+                  description: cardErrorDescription,
+                ),
+              ),
+            );
+          }
+
+          return _buildSearchableListUI(
+            context,
+            provider,
+            Flexible(
+              child: ListView.builder(
+                itemCount: provider.searchResult.restaurants.length,
+                itemBuilder: (ctx, index) {
+                  final _item = restaurantItemToRestaurantModel(
+                      provider.searchResult.restaurants[index]);
+
+                  return Container(
+                    margin: EdgeInsets.symmetric(horizontal: 12.0),
+                    child: CardItem(
+                      item: _item,
+                      onTapCallback: (restaurant) {
+                        Navigator.of(context).pushNamed(
+                            DetailRestaurantPage.route,
+                            arguments: _item);
+                      },
                     ),
-                  ),
-                  fillColor: darkGreen,
-                  focusColor: darkGreen,
-                  hoverColor: darkGreen,
-                  suffixIcon: GestureDetector(
-                    child: Icon(LineIcons.search, color: darkGreen),
-                    onTap: () {
-                      _searchList(_controller.text);
-                    },
-                  ),
-                  hintText: 'Search here',
-                  hintStyle: TextStyle(color: Colors.black38)),
+                  );
+                },
+              ),
             ),
-          ),
-          SizedBox(height: 20),
-          Flexible(
-            child: _shouldListShown
-                ? ListView.builder(
-                    padding: EdgeInsets.symmetric(horizontal: 12.0),
-                    itemCount: _tempData.length,
-                    itemBuilder: (ctx, index) {
-                      return CardItem(
-                        item: _tempData[index],
-                        onTapCallback: (restaurant) {
-                          Navigator.of(context).pushNamed(
-                              DetailRestaurantPage.route,
-                              arguments: restaurant);
-                        },
-                      );
-                    },
-                  )
-                : Container(
-                    child: Center(
-                      child: !widget.hasError
-                          ? Column(
-                              children: [
-                                SizedBox(height: 56.0),
-                                Icon(LineIcons.mapMarked,
-                                    size: 142.0,
-                                    color: darkGreen.withOpacity(0.4)),
-                                Text(
-                                    'Explore your favorite restaurants with us.',
-                                    style: TextStyle(
-                                        fontSize: 18.0,
-                                        fontWeight: FontWeight.bold,
-                                        color: darkGreen),
-                                    textAlign: TextAlign.center)
-                              ],
-                            )
-                          : Container(
-                              height: 120.0,
-                              margin: EdgeInsets.symmetric(horizontal: 12.0),
-                              child: CardError(
-                                label: cardErrorLabel,
-                                description: cardErrorDescription,
-                              ),
-                            ),
-                    ),
-                  ),
-          ),
-          Container(
-            child: _shouldEmptyListShown
-                ? Expanded(
-                    flex: 4,
-                    child: Center(
-                      child: Text('No item found!',
-                          style: TextStyle(
-                              color: darkGreen,
-                              fontSize: 18.0,
-                              fontWeight: FontWeight.bold)),
-                    ),
-                  )
-                : null,
-          ),
-        ],
+          );
+        },
       ),
     );
   }
 
-  void _searchList(String query) {
-    if (widget.hasError) return;
-
-    if (query.isEmpty) {
-      setState(() {
-        _tempData = widget.restaurants;
-        _shouldListShown = false;
-        _shouldEmptyListShown = false;
-      });
-      return;
-    }
-
-    List<Restaurant> result = [];
-
-    for (var restaurant in widget.restaurants) {
-      if (restaurant.name.toLowerCase().contains(query.toLowerCase())) {
-        result.add(restaurant);
-      }
-    }
-
-    setState(() {
-      _shouldListShown = true;
-      _tempData = result;
-
-      if (_tempData.isEmpty) {
-        _shouldEmptyListShown = true;
-      } else {
-        _shouldEmptyListShown = false;
-      }
-    });
+  Widget _buildSearchableListUI(
+      BuildContext context, SearchRestaurantsProvider provider, Widget child) {
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          child: TextField(
+            controller: provider.inputController,
+            onChanged: (text) {
+              _searchList(text, provider);
+            },
+            onSubmitted: (text) {},
+            decoration: InputDecoration(
+                border: UnderlineInputBorder(
+                  borderSide: BorderSide(
+                    color: darkGreen,
+                  ),
+                ),
+                fillColor: darkGreen,
+                focusColor: darkGreen,
+                hoverColor: darkGreen,
+                suffixIcon: GestureDetector(
+                  child: Icon(LineIcons.search, color: darkGreen),
+                  onTap: () {
+                    _searchList(provider.inputController.text, provider);
+                  },
+                ),
+                hintText: 'Search here',
+                hintStyle: TextStyle(color: Colors.black38)),
+          ),
+        ),
+        SizedBox(height: 20),
+        child,
+      ],
+    );
   }
 }
