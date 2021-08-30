@@ -216,7 +216,9 @@ class DetailRestaurantPage extends StatelessWidget {
       return Padding(
         padding: const EdgeInsets.symmetric(vertical: 24.0),
         child: Center(
-          child: CircularProgressIndicator(),
+          child: CircularProgressIndicator(
+            color: lightGreen,
+          ),
         ),
       );
     } else if (provider.state == ResultState.HasData) {
@@ -280,7 +282,9 @@ _buildReviewsUI(BuildContext context, DetailRestaurantProvider provider) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 24.0),
       child: Center(
-        child: CircularProgressIndicator(),
+        child: CircularProgressIndicator(
+          color: lightGreen,
+        ),
       ),
     );
   }
@@ -321,15 +325,20 @@ _buildReviewsUI(BuildContext context, DetailRestaurantProvider provider) {
                   children: [
                     Text(review.name,
                         style: TextStyle(
-                            fontSize: 16.0, fontWeight: FontWeight.bold)),
+                            fontSize: 16.0,
+                            fontWeight: FontWeight.bold,
+                            color: lightGreen)),
                     Text(review.date,
                         style: TextStyle(fontSize: 14.0, color: Colors.grey)),
                   ],
                 ),
-                SizedBox(height: 12.0),
+                SizedBox(height: 16.0),
                 Text(
                   '`' + review.review + '`',
-                  style: TextStyle(fontSize: 16.0, fontStyle: FontStyle.italic),
+                  style: TextStyle(
+                      fontSize: 16.0,
+                      fontStyle: FontStyle.italic,
+                      color: Colors.grey.shade700),
                 ),
               ],
             ),
