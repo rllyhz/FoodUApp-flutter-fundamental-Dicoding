@@ -18,8 +18,8 @@ class CardError extends StatelessWidget {
       height: height,
       padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
       decoration: BoxDecoration(
-        color: Colors.red.shade200,
-        borderRadius: BorderRadius.circular(8.0),
+        color: Colors.red.shade100,
+        borderRadius: BorderRadius.circular(4.0),
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
