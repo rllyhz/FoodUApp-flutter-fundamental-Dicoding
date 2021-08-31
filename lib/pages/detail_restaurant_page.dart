@@ -250,8 +250,9 @@ class DetailRestaurantPage extends StatelessWidget {
       );
     } else
       return CardError(
+        height: 120.0,
         label: cardErrorLabel,
-        description: provider.message,
+        description: cardErrorDescription,
       );
   }
 
@@ -280,6 +281,14 @@ class DetailRestaurantPage extends StatelessWidget {
 
   Widget _buildReviewsUI(
       BuildContext context, DetailRestaurantProvider provider) {
+    if (provider.shouldShowToast &&
+        provider.customerReviewState == ResultState.HasData)
+      _showToast("Successfully post the review!");
+
+    if (provider.shouldShowToast &&
+        provider.customerReviewState == ResultState.Error)
+      _showToast('Failed to post the review!');
+
     if (provider.state == ResultState.Loading) {
       return Padding(
         padding: const EdgeInsets.symmetric(vertical: 24.0),
@@ -297,6 +306,14 @@ class DetailRestaurantPage extends StatelessWidget {
       );
     }
 
+    if (provider.state == ResultState.Error) {
+      return CardError(
+        height: 120.0,
+        label: cardErrorLabel,
+        description: cardErrorDescription,
+      );
+    }
+
     if (provider.customerReviews.isEmpty) {
       return Container(
         child: Column(
@@ -311,14 +328,6 @@ class DetailRestaurantPage extends StatelessWidget {
         ),
       );
     }
-
-    if (provider.shouldShowToast &&
-        provider.customerReviewState == ResultState.HasData)
-      _showToast("Successfully post the review!");
-
-    if (provider.shouldShowToast &&
-        provider.customerReviewState == ResultState.Error)
-      _showToast('Failed to post the review!');
 
     final customerReviews = provider.customerReviews;
     customerReviews.sort((before, next) =>
