@@ -1,3 +1,5 @@
+import 'package:restaurant_app/data/model/restaurant_review.dart';
+import 'package:restaurant_app/data/response/add_review_result.dart';
 import 'package:restaurant_app/data/response/detail_restaurant_result.dart';
 import 'package:restaurant_app/data/response/restaurant_result.dart';
 import 'package:http/http.dart' as http;
@@ -7,6 +9,7 @@ enum ResultState { Loading, HasData, NoData, Error, Empty }
 
 class ApiService {
   static final String _baseUrl = 'https://restaurant-api.dicoding.dev/';
+  static final String _APIKEY_FOR_TESTING = '12345';
 
   static final String pictureMediumSizeBaseUrl =
       'https://restaurant-api.dicoding.dev/images/medium/';
@@ -40,6 +43,28 @@ class ApiService {
       return searchRestaurantsResultFromJson(response.body);
     } else {
       throw Exception('Failed to search restaurants using query: ' + query);
+    }
+  }
+
+  Future<AddReviewResult> addReview(
+      String id, String review, String name) async {
+    final response = await http.post(
+      Uri.parse(_baseUrl + "review"),
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'X-Auth-Token': _APIKEY_FOR_TESTING,
+      },
+      body: {
+        'id': id,
+        'review': review,
+        'name': name,
+      },
+    );
+
+    if (response.statusCode == 200) {
+      return addReviewResultFromJson(response.body);
+    } else {
+      throw Exception('Failed to add reviews');
     }
   }
 }

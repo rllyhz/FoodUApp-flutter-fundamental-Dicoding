@@ -6,6 +6,7 @@ import 'package:restaurant_app/api/api_service.dart';
 import 'package:restaurant_app/data/model/restaurant.dart';
 import 'package:restaurant_app/provider/detail_restaurant_provider.dart';
 import 'package:restaurant_app/utils/constants.dart';
+import 'package:restaurant_app/utils/time_utils.dart';
 import 'package:restaurant_app/widgets/card_error.dart';
 
 class DetailRestaurantPage extends StatelessWidget {
@@ -275,76 +276,131 @@ class DetailRestaurantPage extends StatelessWidget {
       ),
     );
   }
-}
 
-_buildReviewsUI(BuildContext context, DetailRestaurantProvider provider) {
-  if (provider.state == ResultState.Loading) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 24.0),
-      child: Center(
-        child: CircularProgressIndicator(
-          color: lightGreen,
-        ),
-      ),
-    );
-  }
-
-  final restaurant = provider.detailRestaurant.restaurant;
-
-  if (restaurant.customerReviews.isEmpty) {
-    return Container(
-      child: Text(
-        'No reviews yet.',
-        style: TextStyle(fontSize: 16.0),
-      ),
-    );
-  }
-
-  return ListView.builder(
-    physics: ClampingScrollPhysics(),
-    shrinkWrap: true,
-    itemCount: restaurant.customerReviews.length,
-    itemBuilder: (ctx, index) {
-      final review = restaurant.customerReviews[index];
-
+  Widget _buildReviewsUI(
+      BuildContext context, DetailRestaurantProvider provider) {
+    if (provider.state == ResultState.Loading) {
       return Padding(
-        padding: EdgeInsets.only(
-          left: index % 2 == 0 ? 0 : 42.0,
-          right: index % 2 == 0 ? 42.0 : 0,
-          bottom: 4.0,
-        ),
-        child: Card(
-          child: Padding(
-            padding: EdgeInsets.all(12.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(review.name,
-                        style: TextStyle(
-                            fontSize: 16.0,
-                            fontWeight: FontWeight.bold,
-                            color: lightGreen)),
-                    Text(review.date,
-                        style: TextStyle(fontSize: 14.0, color: Colors.grey)),
-                  ],
-                ),
-                SizedBox(height: 16.0),
-                Text(
-                  '`' + review.review + '`',
-                  style: TextStyle(
-                      fontSize: 16.0,
-                      fontStyle: FontStyle.italic,
-                      color: Colors.grey.shade700),
-                ),
-              ],
-            ),
+        padding: const EdgeInsets.symmetric(vertical: 24.0),
+        child: Center(
+          child: Column(
+            children: [
+              _buildAddReviewInputUI(context, provider),
+              SizedBox(height: 12.0),
+              CircularProgressIndicator(
+                color: lightGreen,
+              ),
+            ],
           ),
         ),
       );
-    },
-  );
+    }
+
+    if (provider.customerReviews.isEmpty) {
+      return Container(
+        child: Column(
+          children: [
+            _buildAddReviewInputUI(context, provider),
+            SizedBox(height: 12.0),
+            Text(
+              'No reviews yet.',
+              style: TextStyle(fontSize: 16.0),
+            ),
+          ],
+        ),
+      );
+    }
+
+    final customerReviews = provider.customerReviews;
+
+    return Column(
+      children: [
+        _buildAddReviewInputUI(context, provider),
+        SizedBox(height: 12.0),
+        ListView.builder(
+          physics: ClampingScrollPhysics(),
+          shrinkWrap: true,
+          itemCount: customerReviews.length,
+          itemBuilder: (ctx, index) {
+            final review = customerReviews[index];
+
+            return Padding(
+              padding: EdgeInsets.only(
+                left: index % 2 == 0 ? 0 : 42.0,
+                right: index % 2 == 0 ? 42.0 : 0,
+                bottom: 4.0,
+              ),
+              child: Card(
+                child: Padding(
+                  padding: EdgeInsets.all(12.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(review.name,
+                              style: TextStyle(
+                                  fontSize: 16.0,
+                                  fontWeight: FontWeight.bold,
+                                  color: lightGreen)),
+                          Text(review.date,
+                              style: TextStyle(
+                                  fontSize: 14.0, color: Colors.grey)),
+                        ],
+                      ),
+                      SizedBox(height: 16.0),
+                      Text(
+                        '`' + review.review + '`',
+                        style: TextStyle(
+                            fontSize: 16.0,
+                            fontStyle: FontStyle.italic,
+                            color: Colors.grey.shade700),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          },
+        ),
+      ],
+    );
+  }
+
+  Widget _buildAddReviewInputUI(
+      BuildContext context, DetailRestaurantProvider provider) {
+    return Container(
+      margin: EdgeInsets.symmetric(vertical: 8.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          Flexible(
+            child: TextField(
+              controller: provider.addReviewInputController,
+              decoration: InputDecoration(
+                hintText: 'Add new review',
+              ),
+            ),
+          ),
+          SizedBox(width: 12.0),
+          provider.customerReviewState == ResultState.Loading
+              ? Center(
+                  child: CircularProgressIndicator(
+                    color: lightGreen,
+                  ),
+                )
+              : ElevatedButton(
+                  style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.all(darkGreen)),
+                  onPressed: () {
+                    provider.postReview();
+                  },
+                  child: Text('Post'),
+                ),
+        ],
+      ),
+    );
+  }
 }
