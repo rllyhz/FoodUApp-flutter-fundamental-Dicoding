@@ -30,12 +30,15 @@ class SearchPage extends StatelessWidget {
               provider,
               Column(
                 children: [
-                  SizedBox(height: 56.0),
-                  Icon(LineIcons.mapMarked,
-                      size: 142.0, color: darkGreen.withOpacity(0.4)),
+                  SizedBox(height: 12.0),
+                  Icon(
+                    LineIcons.mapMarked,
+                    size: MediaQuery.of(context).size.height / 5.6,
+                    color: darkGreen.withOpacity(0.4),
+                  ),
                   Text('Explore your favorite restaurants with us.',
                       style: TextStyle(
-                          fontSize: 18.0,
+                          fontSize: MediaQuery.of(context).size.height / 36.6,
                           fontWeight: FontWeight.bold,
                           color: darkGreen),
                       textAlign: TextAlign.center)
@@ -47,9 +50,10 @@ class SearchPage extends StatelessWidget {
               context,
               provider,
               Container(
-                margin: EdgeInsets.only(top: 42.0),
+                margin: EdgeInsets.only(top: 36.0),
                 child: Center(
                   child: LoadingFeedback(
+                    fontSize: MediaQuery.of(context).size.height / 36.6,
                     text: "Finding what you're looking for...",
                   ),
                 ),
@@ -62,7 +66,7 @@ class SearchPage extends StatelessWidget {
               Container(
                 margin: EdgeInsets.symmetric(horizontal: 12.0),
                 child: CardError(
-                  height: 138.0,
+                  fontSize: MediaQuery.of(context).size.height / 38,
                   label: "Opps... Item not found!",
                   description:
                       "Data you're looking for could not be found. \nPlease make sure you type the correct query.",
@@ -86,26 +90,24 @@ class SearchPage extends StatelessWidget {
           return _buildSearchableListUI(
             context,
             provider,
-            Flexible(
-              child: ListView.builder(
-                itemCount: provider.searchResult.restaurants.length,
-                itemBuilder: (ctx, index) {
-                  final _item = restaurantItemToRestaurantModel(
-                      provider.searchResult.restaurants[index]);
+            ListView.builder(
+              itemCount: provider.searchResult.restaurants.length,
+              itemBuilder: (ctx, index) {
+                final _item = restaurantItemToRestaurantModel(
+                    provider.searchResult.restaurants[index]);
 
-                  return Container(
-                    margin: EdgeInsets.symmetric(horizontal: 12.0),
-                    child: CardItem(
-                      item: _item,
-                      onTapCallback: (restaurant) {
-                        Navigator.of(context).pushNamed(
-                            DetailRestaurantPage.route,
-                            arguments: _item);
-                      },
-                    ),
-                  );
-                },
-              ),
+                return Container(
+                  margin: EdgeInsets.symmetric(horizontal: 12.0),
+                  child: CardItem(
+                    item: _item,
+                    onTapCallback: (restaurant) {
+                      Navigator.of(context).pushNamed(
+                          DetailRestaurantPage.route,
+                          arguments: _item);
+                    },
+                  ),
+                );
+              },
             ),
           );
         },
@@ -117,35 +119,43 @@ class SearchPage extends StatelessWidget {
       BuildContext context, SearchRestaurantsProvider provider, Widget child) {
     return Column(
       children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0),
-          child: TextField(
-            controller: provider.inputController,
-            onChanged: (text) {
-              _searchList(text, provider);
-            },
-            onSubmitted: (text) {},
-            decoration: InputDecoration(
-                border: UnderlineInputBorder(
-                  borderSide: BorderSide(
-                    color: darkGreen,
+        Flexible(
+          flex: 1,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: TextField(
+              controller: provider.inputController,
+              onChanged: (text) {
+                _searchList(text, provider);
+              },
+              onSubmitted: (text) {},
+              decoration: InputDecoration(
+                  border: UnderlineInputBorder(
+                    borderSide: BorderSide(
+                      color: darkGreen,
+                    ),
                   ),
-                ),
-                fillColor: darkGreen,
-                focusColor: darkGreen,
-                hoverColor: darkGreen,
-                suffixIcon: GestureDetector(
-                  child: Icon(LineIcons.search, color: darkGreen),
-                  onTap: () {
-                    _searchList(provider.inputController.text, provider);
-                  },
-                ),
-                hintText: 'Search here',
-                hintStyle: TextStyle(color: Colors.black38)),
+                  fillColor: darkGreen,
+                  focusColor: darkGreen,
+                  hoverColor: darkGreen,
+                  suffixIcon: GestureDetector(
+                    child: Icon(LineIcons.search, color: darkGreen),
+                    onTap: () {
+                      _searchList(provider.inputController.text, provider);
+                    },
+                  ),
+                  hintText: 'Search here',
+                  hintStyle: TextStyle(color: Colors.black38)),
+            ),
           ),
         ),
-        SizedBox(height: 20),
-        child,
+        Flexible(
+          flex: 4,
+          child: Padding(
+            padding: EdgeInsets.only(top: 12.0),
+            child: child,
+          ),
+        ),
       ],
     );
   }

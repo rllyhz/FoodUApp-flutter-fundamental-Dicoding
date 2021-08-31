@@ -1,4 +1,3 @@
-import 'package:restaurant_app/data/model/restaurant_review.dart';
 import 'package:restaurant_app/data/response/add_review_result.dart';
 import 'package:restaurant_app/data/response/detail_restaurant_result.dart';
 import 'package:restaurant_app/data/response/restaurant_result.dart';
@@ -9,7 +8,7 @@ enum ResultState { Loading, HasData, NoData, Error, Empty }
 
 class ApiService {
   static final String _baseUrl = 'https://restaurant-api.dicoding.dev/';
-  static final String _APIKEY_FOR_TESTING = '12345';
+  static final String _apikeyForTesting = '12345';
 
   static final String pictureMediumSizeBaseUrl =
       'https://restaurant-api.dicoding.dev/images/medium/';
@@ -52,7 +51,7 @@ class ApiService {
       Uri.parse(_baseUrl + "review"),
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
-        'X-Auth-Token': _APIKEY_FOR_TESTING,
+        'X-Auth-Token': _apikeyForTesting,
       },
       body: {
         'id': id,

@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:restaurant_app/utils/constants.dart';
 
 class LoadingFeedback extends StatelessWidget {
-  const LoadingFeedback({Key? key, required this.text}) : super(key: key);
+  const LoadingFeedback({Key? key, required this.text, this.fontSize = 18.0})
+      : super(key: key);
 
   final String text;
+  final double fontSize;
 
   @override
   Widget build(BuildContext context) {
@@ -17,7 +19,7 @@ class LoadingFeedback extends StatelessWidget {
         Text(text,
             style: TextStyle(
               color: darkGreen,
-              fontSize: 18.0,
+              fontSize: fontSize,
             )),
       ],
     );
