@@ -312,6 +312,11 @@ class DetailRestaurantPage extends StatelessWidget {
     }
 
     final customerReviews = provider.customerReviews;
+    customerReviews.sort((before, next) =>
+        convertStringDateToDateTime(before.date)
+                .isAfter(convertStringDateToDateTime(next.date))
+            ? -1
+            : 1);
 
     return Column(
       children: [
