@@ -44,6 +44,9 @@ class DetailRestaurantProvider extends ChangeNotifier {
   ResultState _customerReviewState = ResultState.Empty;
   ResultState get customerReviewState => _customerReviewState;
 
+  bool _shouldShowToast = false;
+  bool get shouldShowToast => _shouldShowToast;
+
   String _customerReviewMessage = '';
   String get customerReviewMessage => _customerReviewMessage;
 
@@ -67,6 +70,7 @@ class DetailRestaurantProvider extends ChangeNotifier {
   Future<dynamic> _addReview(String id, String review, String name) async {
     try {
       _customerReviewState = ResultState.Loading;
+      _shouldShowToast = false;
       notifyListeners();
 
       final addReviewResult = await apiService.addReview(id, review, name);
@@ -76,23 +80,27 @@ class DetailRestaurantProvider extends ChangeNotifier {
         _customerReviewState = ResultState.HasData;
         _customerReviews = addReviewResult.customerReviews;
         addReviewInputController.text = "";
+        _shouldShowToast = true;
         notifyListeners();
         return _customerReviews;
       } else if (!addReviewResult.error &&
           addReviewResult.customerReviews.isEmpty) {
         _customerReviewState = ResultState.NoData;
         _customerReviewMessage = addReviewResult.message;
+        _shouldShowToast = true;
         notifyListeners();
         return _customerReviewMessage;
       } else {
         _customerReviewState = ResultState.Error;
         _customerReviewMessage = addReviewResult.message;
+        _shouldShowToast = true;
         notifyListeners();
         return _customerReviewMessage;
       }
     } catch (e) {
       _customerReviewState = ResultState.Error;
       _customerReviewMessage = 'Error --> $e';
+      _shouldShowToast = true;
       notifyListeners();
       return _customerReviewMessage;
     }

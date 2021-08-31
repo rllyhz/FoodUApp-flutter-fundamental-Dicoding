@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:line_icons/line_icons.dart';
 import 'package:provider/provider.dart';
 import 'package:restaurant_app/api/api_service.dart';
@@ -311,6 +312,14 @@ class DetailRestaurantPage extends StatelessWidget {
       );
     }
 
+    if (provider.shouldShowToast &&
+        provider.customerReviewState == ResultState.HasData)
+      _showToast("Successfully post the review!");
+
+    if (provider.shouldShowToast &&
+        provider.customerReviewState == ResultState.Error)
+      _showToast('Failed to post the review!');
+
     final customerReviews = provider.customerReviews;
     customerReviews.sort((before, next) =>
         convertStringDateToDateTime(before.date)
@@ -406,6 +415,14 @@ class DetailRestaurantPage extends StatelessWidget {
                 ),
         ],
       ),
+    );
+  }
+
+  void _showToast(String message) {
+    Fluttertoast.showToast(
+      msg: message,
+      gravity: ToastGravity.CENTER,
+      timeInSecForIosWeb: 1,
     );
   }
 }
