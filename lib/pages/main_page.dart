@@ -39,31 +39,35 @@ class _MainPageState extends State<MainPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: _buildAppBarUI(context),
-      bottomNavigationBar: _buildBottomNavBarUI(context),
-      backgroundColor: Colors.grey[50],
-      body: PageView(
-        scrollDirection: Axis.horizontal,
-        controller: _controller,
-        onPageChanged: (newSelectedIndex) {
-          setState(() {
-            _selectedIndex = newSelectedIndex;
-          });
-        },
-        physics: BouncingScrollPhysics(),
-        children: [
-          ChangeNotifierProvider<RestaurantProvider>(
-            create: (_) => RestaurantProvider(apiService: ApiService()),
-            child: HomePage(),
-          ),
-          ChangeNotifierProvider<SearchRestaurantsProvider>(
-            create: (_) => SearchRestaurantsProvider(apiService: ApiService()),
-            child: SearchPage(),
-          ),
-          FavoritesPage(),
-          ProfilePage(),
-        ],
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider<RestaurantProvider>(
+          create: (_) => RestaurantProvider(apiService: ApiService()),
+        ),
+        ChangeNotifierProvider<SearchRestaurantsProvider>(
+          create: (_) => SearchRestaurantsProvider(apiService: ApiService()),
+        ),
+      ],
+      child: Scaffold(
+        appBar: _buildAppBarUI(context),
+        bottomNavigationBar: _buildBottomNavBarUI(context),
+        backgroundColor: Colors.grey[50],
+        body: PageView(
+          scrollDirection: Axis.horizontal,
+          controller: _controller,
+          onPageChanged: (newSelectedIndex) {
+            setState(() {
+              _selectedIndex = newSelectedIndex;
+            });
+          },
+          physics: BouncingScrollPhysics(),
+          children: [
+            HomePage(),
+            SearchPage(),
+            FavoritesPage(),
+            ProfilePage(),
+          ],
+        ),
       ),
     );
   }
