@@ -3,10 +3,12 @@ import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:line_icons/line_icons.dart';
 import 'package:provider/provider.dart';
 import 'package:restaurant_app/data/api/api_service.dart';
+import 'package:restaurant_app/data/db/database_helper.dart';
 import 'package:restaurant_app/data/preferences/preference_helper.dart';
 import 'package:restaurant_app/pages/home_page.dart';
 import 'package:restaurant_app/pages/profile_page.dart';
 import 'package:restaurant_app/pages/search_page.dart';
+import 'package:restaurant_app/provider/database_provider.dart';
 import 'package:restaurant_app/provider/preferences_provider.dart';
 import 'package:restaurant_app/provider/restaurant_provider.dart';
 import 'package:restaurant_app/provider/search_restaurants_provider.dart';
@@ -56,6 +58,11 @@ class _MainPageState extends State<MainPage> {
             preferencesHelper: PreferenceHelper(
               sharedPreferences: SharedPreferences.getInstance(),
             ),
+          ),
+        ),
+        ChangeNotifierProvider<DatabaseProvider>(
+          create: (_) => DatabaseProvider(
+            databaseHelper: DatabaseHelper(),
           ),
         ),
       ],

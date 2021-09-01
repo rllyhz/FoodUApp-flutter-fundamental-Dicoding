@@ -21,6 +21,17 @@ RestaurantModel restaurantItemToRestaurantModel(
       reviews: null,
     );
 
+restaurant_result.Restaurant restaurantModelToRestaurantItem(
+        RestaurantModel restaurantModel) =>
+    restaurant_result.Restaurant(
+      id: restaurantModel.id,
+      name: restaurantModel.name,
+      description: restaurantModel.description,
+      pictureId: restaurantModel.pictureId,
+      city: restaurantModel.city,
+      rating: restaurantModel.rating,
+    );
+
 RestaurantModel detailRestaurantToRestaurantModel(
         detail_restaurant_result.Restaurant restaurant) =>
     RestaurantModel(

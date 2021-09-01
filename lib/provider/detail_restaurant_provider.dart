@@ -1,14 +1,20 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:restaurant_app/data/api/api_service.dart';
+import 'package:restaurant_app/data/db/database_helper.dart';
 import 'package:restaurant_app/data/model/restaurant_review.dart';
 import 'package:restaurant_app/data/response/detail_restaurant_result.dart';
 
 class DetailRestaurantProvider extends ChangeNotifier {
   final ApiService apiService;
+  final DatabaseHelper databaseHelper;
   final String id;
 
-  DetailRestaurantProvider({required this.apiService, required this.id}) {
+  DetailRestaurantProvider({
+    required this.databaseHelper,
+    required this.apiService,
+    required this.id,
+  }) {
     _fetchDetailRestaurant(id);
   }
 
@@ -31,14 +37,6 @@ class DetailRestaurantProvider extends ChangeNotifier {
 
   ScrollController _controller = ScrollController();
   ScrollController get scrollController => _controller;
-
-  bool _isFav = false;
-  bool get isFav => _isFav;
-
-  set isFav(bool value) {
-    _isFav = value;
-    notifyListeners();
-  }
 
   // Customer Reviews
   ResultState _customerReviewState = ResultState.Empty;

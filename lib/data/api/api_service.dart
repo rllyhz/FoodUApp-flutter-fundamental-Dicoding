@@ -1,7 +1,7 @@
+import 'package:http/http.dart' as http;
 import 'package:restaurant_app/data/response/add_review_result.dart';
 import 'package:restaurant_app/data/response/detail_restaurant_result.dart';
 import 'package:restaurant_app/data/response/restaurant_result.dart';
-import 'package:http/http.dart' as http;
 import 'package:restaurant_app/data/response/search_restaurant_result.dart';
 
 enum ResultState { Loading, HasData, NoData, Error, Empty }
