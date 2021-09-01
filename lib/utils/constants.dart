@@ -9,3 +9,9 @@ const cardErrorDescription =
 
 const addedToFavMessage = 'Added to favorites!';
 const deletedFromFavMessage = 'Deleted from favorites!';
+
+// Keys for testing
+const greetingText1Key = Key('greeting-text-1-key');
+const greetingText2Key = Key('greeting-text-2-key');
+const mapMarkedIconKey = Key('map-marked-icon-key');
+const descriptionMapMarkedIconKey = Key('description-map-marked-icon-key');
