@@ -19,6 +19,8 @@ Widget _createSearchScreen() =>
     );
 
 main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+
   testWidgets('check if icon and its description text show up on Search Page',
       (WidgetTester tester) async {
     await tester.pumpWidget(_createSearchScreen());
