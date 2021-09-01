@@ -3,12 +3,16 @@ import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:line_icons/line_icons.dart';
 import 'package:provider/provider.dart';
 import 'package:restaurant_app/data/api/api_service.dart';
+import 'package:restaurant_app/data/preferences/preference_helper.dart';
 import 'package:restaurant_app/pages/home_page.dart';
 import 'package:restaurant_app/pages/profile_page.dart';
 import 'package:restaurant_app/pages/search_page.dart';
+import 'package:restaurant_app/provider/preferences_provider.dart';
 import 'package:restaurant_app/provider/restaurant_provider.dart';
 import 'package:restaurant_app/provider/search_restaurants_provider.dart';
 import 'package:restaurant_app/utils/constants.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
 import 'favorites_page.dart';
 
 class MainPage extends StatefulWidget {
@@ -46,6 +50,13 @@ class _MainPageState extends State<MainPage> {
         ),
         ChangeNotifierProvider<SearchRestaurantsProvider>(
           create: (_) => SearchRestaurantsProvider(apiService: ApiService()),
+        ),
+        ChangeNotifierProvider<PreferencesProvider>(
+          create: (_) => PreferencesProvider(
+            preferencesHelper: PreferenceHelper(
+              sharedPreferences: SharedPreferences.getInstance(),
+            ),
+          ),
         ),
       ],
       child: Scaffold(
