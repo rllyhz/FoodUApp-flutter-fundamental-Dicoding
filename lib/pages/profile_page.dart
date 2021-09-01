@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:line_icons/line_icons.dart';
 import 'package:provider/provider.dart';
-import 'package:restaurant_app/pages/notification_settings.dart';
+import 'package:restaurant_app/pages/notification_settings_page.dart';
 import 'package:restaurant_app/provider/preferences_provider.dart';
 import 'package:restaurant_app/utils/constants.dart';
 
@@ -178,7 +178,7 @@ class ProfilePage extends StatelessWidget {
                         Icons.notifications_none_outlined,
                         () {
                           Navigator.of(context)
-                              .pushNamed(NotificationSettings.route);
+                              .pushNamed(NotificationSettingsPage.route);
                         },
                       ),
                       _buildProfileMenuItem(
