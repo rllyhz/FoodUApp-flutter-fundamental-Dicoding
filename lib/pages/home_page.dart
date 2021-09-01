@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:restaurant_app/data/api/api_service.dart';
 import 'package:restaurant_app/provider/restaurant_provider.dart';
 import 'package:restaurant_app/utils/constants.dart';
-import 'package:restaurant_app/utils/greeting_generator.dart';
+import 'package:restaurant_app/utils/generator.dart';
 import 'package:restaurant_app/utils/model_converter.dart';
 import 'package:restaurant_app/widgets/card_error.dart';
 import 'package:restaurant_app/widgets/card_item.dart';
