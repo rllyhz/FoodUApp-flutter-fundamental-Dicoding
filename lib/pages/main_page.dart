@@ -53,18 +53,6 @@ class _MainPageState extends State<MainPage> {
         ChangeNotifierProvider<SearchRestaurantsProvider>(
           create: (_) => SearchRestaurantsProvider(apiService: ApiService()),
         ),
-        ChangeNotifierProvider<PreferencesProvider>(
-          create: (_) => PreferencesProvider(
-            preferencesHelper: PreferenceHelper(
-              sharedPreferences: SharedPreferences.getInstance(),
-            ),
-          ),
-        ),
-        ChangeNotifierProvider<DatabaseProvider>(
-          create: (_) => DatabaseProvider(
-            databaseHelper: DatabaseHelper(),
-          ),
-        ),
       ],
       child: Scaffold(
         appBar: _buildAppBarUI(context),
@@ -82,8 +70,20 @@ class _MainPageState extends State<MainPage> {
           children: [
             HomePage(),
             SearchPage(),
-            FavoritesPage(),
-            ProfilePage(),
+            ChangeNotifierProvider<DatabaseProvider>(
+              create: (_) => DatabaseProvider(
+                databaseHelper: DatabaseHelper(),
+              ),
+              child: FavoritesPage(),
+            ),
+            ChangeNotifierProvider<PreferencesProvider>(
+              create: (_) => PreferencesProvider(
+                preferencesHelper: PreferenceHelper(
+                  sharedPreferences: SharedPreferences.getInstance(),
+                ),
+              ),
+              child: ProfilePage(),
+            ),
           ],
         ),
       ),
