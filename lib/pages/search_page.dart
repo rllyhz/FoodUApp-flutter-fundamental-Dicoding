@@ -33,10 +33,12 @@ class SearchPage extends StatelessWidget {
                   SizedBox(height: 12.0),
                   Icon(
                     LineIcons.mapMarked,
+                    key: mapMarkedIconKey,
                     size: MediaQuery.of(context).size.height / 5.6,
                     color: darkGreen.withOpacity(0.4),
                   ),
                   Text('Explore your favorite restaurants with us.',
+                      key: descriptionMapMarkedIconKey,
                       style: TextStyle(
                           fontSize: MediaQuery.of(context).size.height / 36.6,
                           fontWeight: FontWeight.bold,

@@ -79,12 +79,14 @@ class HomePage extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Text("Hi, Rully",
+            key: greetingText1Key,
             style: TextStyle(
                 color: Colors.black54,
                 fontSize: 18.0,
                 fontWeight: FontWeight.normal)),
         Text(
           generateGreetingText(),
+          key: greetingText2Key,
           style: TextStyle(
               color: Colors.black, fontSize: 24.0, fontWeight: FontWeight.bold),
         ),
