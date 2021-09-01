@@ -4,12 +4,14 @@ class CardError extends StatelessWidget {
   final String label;
   final String description;
   final double height;
+  final double fontSize;
 
   CardError(
       {Key? key,
       required this.label,
       required this.description,
-      this.height = 120.0})
+      this.height = 120.0,
+      this.fontSize = 18.0})
       : super(key: key);
 
   @override
@@ -28,7 +30,7 @@ class CardError extends StatelessWidget {
             label,
             style: TextStyle(
               color: Colors.black.withOpacity(0.75),
-              fontSize: 18.0,
+              fontSize: fontSize,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -37,7 +39,7 @@ class CardError extends StatelessWidget {
             description,
             style: TextStyle(
               color: Colors.black.withOpacity(0.75),
-              fontSize: 18.0,
+              fontSize: fontSize,
             ),
           ),
         ],

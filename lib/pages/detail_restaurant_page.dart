@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:line_icons/line_icons.dart';
 import 'package:provider/provider.dart';
 import 'package:restaurant_app/api/api_service.dart';
 import 'package:restaurant_app/data/model/restaurant.dart';
 import 'package:restaurant_app/provider/detail_restaurant_provider.dart';
 import 'package:restaurant_app/utils/constants.dart';
+import 'package:restaurant_app/utils/time_utils.dart';
 import 'package:restaurant_app/widgets/card_error.dart';
 
 class DetailRestaurantPage extends StatelessWidget {
@@ -189,7 +191,6 @@ class DetailRestaurantPage extends StatelessWidget {
             SizedBox(height: 12.0),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12.0),
-              height: 180.0,
               child: _buildMenuOptions(context, provider),
             ),
             SizedBox(height: 26.0),
@@ -203,7 +204,6 @@ class DetailRestaurantPage extends StatelessWidget {
             SizedBox(height: 12.0),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12.0),
-              height: 250.0,
               child: _buildReviewsUI(context, provider),
             ),
           ]),
@@ -215,8 +215,13 @@ class DetailRestaurantPage extends StatelessWidget {
   Widget _buildMenuOptions(
       BuildContext context, DetailRestaurantProvider provider) {
     if (provider.state == ResultState.Loading) {
-      return Center(
-        child: CircularProgressIndicator(),
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 24.0),
+        child: Center(
+          child: CircularProgressIndicator(
+            color: lightGreen,
+          ),
+        ),
       );
     } else if (provider.state == ResultState.HasData) {
       return ListView.builder(
@@ -224,6 +229,8 @@ class DetailRestaurantPage extends StatelessWidget {
             ? provider.detailRestaurant.restaurant.menus.foods.length
             : provider.detailRestaurant.restaurant.menus.drinks.length,
         controller: provider.scrollController,
+        physics: ClampingScrollPhysics(),
+        shrinkWrap: true,
         itemBuilder: (ctx, index) {
           return Container(
             padding: EdgeInsets.all(8.0),
@@ -243,8 +250,9 @@ class DetailRestaurantPage extends StatelessWidget {
       );
     } else
       return CardError(
+        height: 120.0,
         label: cardErrorLabel,
-        description: provider.message,
+        description: cardErrorDescription,
       );
   }
 
@@ -270,61 +278,160 @@ class DetailRestaurantPage extends StatelessWidget {
       ),
     );
   }
-}
 
-_buildReviewsUI(BuildContext context, DetailRestaurantProvider provider) {
-  if (provider.state == ResultState.Loading) {
-    return Center(
-      child: CircularProgressIndicator(),
+  Widget _buildReviewsUI(
+      BuildContext context, DetailRestaurantProvider provider) {
+    if (provider.shouldShowToast &&
+        provider.customerReviewState == ResultState.HasData)
+      _showToast("Successfully post the review!");
+
+    if (provider.shouldShowToast &&
+        provider.customerReviewState == ResultState.Error)
+      _showToast('Failed to post the review!');
+
+    if (provider.state == ResultState.Loading) {
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 24.0),
+        child: Center(
+          child: Column(
+            children: [
+              _buildAddReviewInputUI(context, provider),
+              SizedBox(height: 12.0),
+              CircularProgressIndicator(
+                color: lightGreen,
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    if (provider.state == ResultState.Error) {
+      return CardError(
+        height: 120.0,
+        label: cardErrorLabel,
+        description: cardErrorDescription,
+      );
+    }
+
+    if (provider.customerReviews.isEmpty) {
+      return Container(
+        child: Column(
+          children: [
+            _buildAddReviewInputUI(context, provider),
+            SizedBox(height: 12.0),
+            Text(
+              'No reviews yet.',
+              style: TextStyle(fontSize: 16.0),
+            ),
+          ],
+        ),
+      );
+    }
+
+    final customerReviews = provider.customerReviews;
+    customerReviews.sort((before, next) =>
+        convertStringDateToDateTime(before.date)
+                .isAfter(convertStringDateToDateTime(next.date))
+            ? -1
+            : 1);
+
+    return Column(
+      children: [
+        _buildAddReviewInputUI(context, provider),
+        SizedBox(height: 12.0),
+        ListView.builder(
+          physics: ClampingScrollPhysics(),
+          shrinkWrap: true,
+          itemCount: customerReviews.length,
+          itemBuilder: (ctx, index) {
+            final review = customerReviews[index];
+
+            return Padding(
+              padding: EdgeInsets.only(
+                left: index % 2 == 0 ? 0 : 42.0,
+                right: index % 2 == 0 ? 42.0 : 0,
+                bottom: 4.0,
+              ),
+              child: Card(
+                child: Padding(
+                  padding: EdgeInsets.all(12.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(review.name,
+                              style: TextStyle(
+                                  fontSize: 16.0,
+                                  fontWeight: FontWeight.bold,
+                                  color: lightGreen)),
+                          Text(review.date,
+                              style: TextStyle(
+                                  fontSize: 14.0, color: Colors.grey)),
+                        ],
+                      ),
+                      SizedBox(height: 16.0),
+                      Text(
+                        '`' + review.review + '`',
+                        style: TextStyle(
+                            fontSize: 16.0,
+                            fontStyle: FontStyle.italic,
+                            color: Colors.grey.shade700),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          },
+        ),
+      ],
     );
   }
 
-  final restaurant = provider.detailRestaurant.restaurant;
-
-  if (restaurant.customerReviews.isEmpty) {
+  Widget _buildAddReviewInputUI(
+      BuildContext context, DetailRestaurantProvider provider) {
     return Container(
-      child: Text(
-        'No reviews yet.',
-        style: TextStyle(fontSize: 16.0),
+      margin: EdgeInsets.symmetric(vertical: 8.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          Flexible(
+            child: TextField(
+              controller: provider.addReviewInputController,
+              decoration: InputDecoration(
+                hintText: 'Add new review',
+              ),
+            ),
+          ),
+          SizedBox(width: 12.0),
+          provider.customerReviewState == ResultState.Loading
+              ? Center(
+                  child: CircularProgressIndicator(
+                    color: lightGreen,
+                  ),
+                )
+              : ElevatedButton(
+                  style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.all(darkGreen)),
+                  onPressed: () {
+                    provider.postReview();
+                  },
+                  child: Text('Post'),
+                ),
+        ],
       ),
     );
   }
 
-  return ListView.builder(
-    physics: ClampingScrollPhysics(),
-    itemCount: restaurant.customerReviews.length,
-    itemBuilder: (ctx, index) {
-      final review = restaurant.customerReviews[index];
-
-      return Padding(
-        padding: EdgeInsets.only(left: index % 2 == 0 ? 0 : 18.0, bottom: 4.0),
-        child: Card(
-          child: Padding(
-            padding: EdgeInsets.all(12.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(review.name,
-                        style: TextStyle(
-                            fontSize: 16.0, fontWeight: FontWeight.bold)),
-                    Text(review.date,
-                        style: TextStyle(fontSize: 14.0, color: Colors.grey)),
-                  ],
-                ),
-                SizedBox(height: 12.0),
-                Text(
-                  '`' + review.review + '`',
-                  style: TextStyle(fontSize: 16.0, fontStyle: FontStyle.italic),
-                ),
-              ],
-            ),
-          ),
-        ),
-      );
-    },
-  );
+  void _showToast(String message) {
+    Fluttertoast.showToast(
+      msg: message,
+      gravity: ToastGravity.CENTER,
+      timeInSecForIosWeb: 1,
+    );
+  }
 }

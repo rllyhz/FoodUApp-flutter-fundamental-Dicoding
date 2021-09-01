@@ -105,7 +105,6 @@ class _ProfilePageState extends State<ProfilePage> {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
             child: Container(
-              height: 260.0,
               padding: EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
               decoration: BoxDecoration(
                 color: Colors.white,
@@ -120,13 +119,15 @@ class _ProfilePageState extends State<ProfilePage> {
               ),
               child: ListView(
                 physics: ClampingScrollPhysics(),
+                shrinkWrap: true,
                 children: [
                   _buildProfileMenuItem(
                       context, 'Username', '@rllyhz', LineIcons.user),
                   _buildProfileMenuItem(context, 'Notifications',
                       'Mute, Push, Email', Icons.notifications_none_outlined),
                   _buildProfileMenuItem(context, 'Settings',
-                      'Security, Privacy', LineIcons.gripLines),
+                      'Security, Privacy', LineIcons.gripLines,
+                      isLastIndex: true),
                 ],
               ),
             ),
@@ -137,15 +138,18 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  Widget _buildProfileMenuItem(BuildContext context, String title,
-      String description, IconData iconData) {
+  Widget _buildProfileMenuItem(
+      BuildContext context, String title, String description, IconData iconData,
+      {bool isLastIndex = false}) {
     return GestureDetector(
       onTap: () {},
       child: Container(
         padding: EdgeInsets.symmetric(vertical: 24.0),
-        margin: EdgeInsets.only(bottom: 12.0),
+        margin: !isLastIndex ? EdgeInsets.only(bottom: 12.0) : null,
         decoration: BoxDecoration(
-          border: Border(bottom: BorderSide(width: 1.0, color: Colors.black12)),
+          border: !isLastIndex
+              ? Border(bottom: BorderSide(width: 1.0, color: Colors.black12))
+              : null,
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.start,
