@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:line_icons/line_icons.dart';
 import 'package:provider/provider.dart';
-import 'package:restaurant_app/api/api_service.dart';
+import 'package:restaurant_app/data/api/api_service.dart';
 import 'package:restaurant_app/pages/detail_restaurant_page.dart';
 import 'package:restaurant_app/provider/search_restaurants_provider.dart';
 import 'package:restaurant_app/utils/constants.dart';
@@ -23,11 +23,11 @@ class SearchPage extends StatelessWidget {
     return Container(
       width: MediaQuery.of(context).size.width,
       child: Consumer<SearchRestaurantsProvider>(
-        builder: (ctx, provider, _) {
-          if (provider.state == ResultState.Empty) {
+        builder: (ctx, apiProvider, _) {
+          if (apiProvider.state == ResultState.Empty) {
             return _buildSearchableListUI(
               context,
-              provider,
+              apiProvider,
               Column(
                 children: [
                   SizedBox(height: 12.0),
@@ -45,10 +45,10 @@ class SearchPage extends StatelessWidget {
                 ],
               ),
             );
-          } else if (provider.state == ResultState.Loading) {
+          } else if (apiProvider.state == ResultState.Loading) {
             return _buildSearchableListUI(
               context,
-              provider,
+              apiProvider,
               Container(
                 margin: EdgeInsets.only(top: 36.0),
                 child: Center(
@@ -59,10 +59,10 @@ class SearchPage extends StatelessWidget {
                 ),
               ),
             );
-          } else if (provider.state == ResultState.NoData) {
+          } else if (apiProvider.state == ResultState.NoData) {
             return _buildSearchableListUI(
               context,
-              provider,
+              apiProvider,
               Container(
                 margin: EdgeInsets.symmetric(horizontal: 12.0),
                 child: CardError(
@@ -73,10 +73,10 @@ class SearchPage extends StatelessWidget {
                 ),
               ),
             );
-          } else if (provider.state == ResultState.Error) {
+          } else if (apiProvider.state == ResultState.Error) {
             return _buildSearchableListUI(
               context,
-              provider,
+              apiProvider,
               Container(
                 margin: EdgeInsets.symmetric(horizontal: 12.0),
                 child: CardError(
@@ -89,12 +89,14 @@ class SearchPage extends StatelessWidget {
 
           return _buildSearchableListUI(
             context,
-            provider,
+            apiProvider,
             ListView.builder(
-              itemCount: provider.searchResult.restaurants.length,
+              itemCount: apiProvider.searchResult.restaurants.length,
               itemBuilder: (ctx, index) {
-                final _item = restaurantItemToRestaurantModel(
-                    provider.searchResult.restaurants[index]);
+                final currentRestaurant =
+                    apiProvider.searchResult.restaurants[index];
+                final _item =
+                    restaurantItemToRestaurantModel(currentRestaurant);
 
                 return Container(
                   margin: EdgeInsets.symmetric(horizontal: 12.0),

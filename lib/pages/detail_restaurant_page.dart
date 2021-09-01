@@ -3,10 +3,13 @@ import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:line_icons/line_icons.dart';
 import 'package:provider/provider.dart';
-import 'package:restaurant_app/api/api_service.dart';
+import 'package:restaurant_app/data/api/api_service.dart';
+import 'package:restaurant_app/data/db/database_helper.dart';
 import 'package:restaurant_app/data/model/restaurant.dart';
+import 'package:restaurant_app/provider/database_provider.dart';
 import 'package:restaurant_app/provider/detail_restaurant_provider.dart';
 import 'package:restaurant_app/utils/constants.dart';
+import 'package:restaurant_app/utils/model_converter.dart';
 import 'package:restaurant_app/utils/time_utils.dart';
 import 'package:restaurant_app/widgets/card_error.dart';
 
@@ -22,9 +25,21 @@ class DetailRestaurantPage extends StatelessWidget {
 
     return Scaffold(
       body: SafeArea(
-        child: ChangeNotifierProvider<DetailRestaurantProvider>(
-          create: (_) => DetailRestaurantProvider(
-              apiService: ApiService(), id: _restaurant.id),
+        child: MultiProvider(
+          providers: [
+            ChangeNotifierProvider<DetailRestaurantProvider>(
+              create: (_) => DetailRestaurantProvider(
+                apiService: ApiService(),
+                databaseHelper: DatabaseHelper(),
+                id: _restaurant.id,
+              ),
+            ),
+            ChangeNotifierProvider<DatabaseProvider>(
+              create: (_) => DatabaseProvider(
+                databaseHelper: DatabaseHelper(),
+              ),
+            ),
+          ],
           child: Consumer<DetailRestaurantProvider>(
             builder: (ctx, provider, _) {
               return _buildDetailInfo(context, provider, _restaurant);
@@ -36,7 +51,7 @@ class DetailRestaurantPage extends StatelessWidget {
   }
 
   Widget _buildDetailInfo(BuildContext context,
-      DetailRestaurantProvider provider, RestaurantModel restaurant) {
+      DetailRestaurantProvider detailProvider, RestaurantModel restaurant) {
     return CustomScrollView(
       physics: const BouncingScrollPhysics(),
       slivers: [
@@ -53,14 +68,38 @@ class DetailRestaurantPage extends StatelessWidget {
             icon: Icon(LineIcons.arrowLeft),
           ),
           actions: [
-            IconButton(
-                onPressed: () {
-                  provider.isFav = !provider.isFav;
-                },
-                icon: Icon(
-                  provider.isFav ? LineIcons.heartAlt : LineIcons.heart,
-                  color: Colors.white,
-                ))
+            Consumer<DatabaseProvider>(
+              builder: (ctx, dbProvider, _) {
+                return FutureBuilder<bool>(
+                  future: dbProvider.isFavorite(restaurant.id),
+                  builder: (ctx, snapshot) {
+                    return IconButton(
+                      onPressed: () {
+                        final _isFav = snapshot.data;
+                        if (_isFav == null) return;
+
+                        final _item =
+                            restaurantModelToRestaurantItem(restaurant);
+
+                        if (!_isFav) {
+                          dbProvider.addFavorite(_item);
+                          _showToast(addedToFavMessage);
+                        } else {
+                          dbProvider.deleteFavorite(_item.id);
+                          _showToast(deletedFromFavMessage);
+                        }
+                      },
+                      icon: Icon(
+                        snapshot.data ?? false
+                            ? LineIcons.heartAlt
+                            : LineIcons.heart,
+                        color: Colors.white,
+                      ),
+                    );
+                  },
+                );
+              },
+            ),
           ],
           flexibleSpace: FlexibleSpaceBar(
             stretchModes: [StretchMode.zoomBackground],
@@ -172,17 +211,17 @@ class DetailRestaurantPage extends StatelessWidget {
               children: [
                 SizedBox(width: 12.0),
                 _buildMenuItem(
-                    provider,
+                    detailProvider,
                     'Foods',
-                    provider.selectedOptionMenuIndex == 0
+                    detailProvider.selectedOptionMenuIndex == 0
                         ? darkGreen
                         : Colors.grey,
                     0),
                 SizedBox(width: 8.0),
                 _buildMenuItem(
-                    provider,
+                    detailProvider,
                     'Drinks',
-                    provider.selectedOptionMenuIndex == 1
+                    detailProvider.selectedOptionMenuIndex == 1
                         ? darkGreen
                         : Colors.grey,
                     1),
@@ -191,7 +230,7 @@ class DetailRestaurantPage extends StatelessWidget {
             SizedBox(height: 12.0),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12.0),
-              child: _buildMenuOptions(context, provider),
+              child: _buildMenuOptions(context, detailProvider),
             ),
             SizedBox(height: 26.0),
             Padding(
@@ -204,7 +243,7 @@ class DetailRestaurantPage extends StatelessWidget {
             SizedBox(height: 12.0),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12.0),
-              child: _buildReviewsUI(context, provider),
+              child: _buildReviewsUI(context, detailProvider),
             ),
           ]),
         ),
@@ -213,8 +252,8 @@ class DetailRestaurantPage extends StatelessWidget {
   }
 
   Widget _buildMenuOptions(
-      BuildContext context, DetailRestaurantProvider provider) {
-    if (provider.state == ResultState.Loading) {
+      BuildContext context, DetailRestaurantProvider detailProvider) {
+    if (detailProvider.state == ResultState.Loading) {
       return Padding(
         padding: const EdgeInsets.symmetric(vertical: 24.0),
         child: Center(
@@ -223,12 +262,12 @@ class DetailRestaurantPage extends StatelessWidget {
           ),
         ),
       );
-    } else if (provider.state == ResultState.HasData) {
+    } else if (detailProvider.state == ResultState.HasData) {
       return ListView.builder(
-        itemCount: provider.selectedOptionMenuIndex == 0
-            ? provider.detailRestaurant.restaurant.menus.foods.length
-            : provider.detailRestaurant.restaurant.menus.drinks.length,
-        controller: provider.scrollController,
+        itemCount: detailProvider.selectedOptionMenuIndex == 0
+            ? detailProvider.detailRestaurant.restaurant.menus.foods.length
+            : detailProvider.detailRestaurant.restaurant.menus.drinks.length,
+        controller: detailProvider.scrollController,
         physics: ClampingScrollPhysics(),
         shrinkWrap: true,
         itemBuilder: (ctx, index) {
@@ -239,9 +278,10 @@ class DetailRestaurantPage extends StatelessWidget {
                   bottom: BorderSide(width: 1.0, color: Colors.grey.shade400)),
             ),
             child: Text(
-              provider.selectedOptionMenuIndex == 0
-                  ? provider.detailRestaurant.restaurant.menus.foods[index].name
-                  : provider
+              detailProvider.selectedOptionMenuIndex == 0
+                  ? detailProvider
+                      .detailRestaurant.restaurant.menus.foods[index].name
+                  : detailProvider
                       .detailRestaurant.restaurant.menus.drinks[index].name,
               style: TextStyle(fontSize: 16.0),
             ),
@@ -256,7 +296,7 @@ class DetailRestaurantPage extends StatelessWidget {
       );
   }
 
-  Widget _buildMenuItem(DetailRestaurantProvider provider, String title,
+  Widget _buildMenuItem(DetailRestaurantProvider detailProvider, String title,
       Color backgroundColor, int index) {
     return ElevatedButton(
       style: ElevatedButton.styleFrom(
@@ -268,8 +308,8 @@ class DetailRestaurantPage extends StatelessWidget {
         padding: EdgeInsets.all(4.0),
       ),
       onPressed: () {
-        provider.setSelectedOptionMenuIndex(index);
-        provider.scrollController.animateTo(0.0,
+        detailProvider.setSelectedOptionMenuIndex(index);
+        detailProvider.scrollController.animateTo(0.0,
             duration: Duration(milliseconds: 200), curve: Curves.easeInOut);
       },
       child: Text(

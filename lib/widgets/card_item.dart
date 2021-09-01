@@ -1,28 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:line_icons/line_icons.dart';
-import 'package:restaurant_app/api/api_service.dart';
+import 'package:restaurant_app/data/api/api_service.dart';
 import 'package:restaurant_app/data/model/restaurant.dart';
 import 'package:restaurant_app/utils/constants.dart';
 
-class CardItem extends StatefulWidget {
+class CardItem extends StatelessWidget {
   final RestaurantModel item;
   final Function(RestaurantModel) onTapCallback;
 
-  const CardItem({Key? key, required this.item, required this.onTapCallback})
-      : super(key: key);
-
-  @override
-  _CardItemState createState() => _CardItemState();
-}
-
-class _CardItemState extends State<CardItem> {
-  bool _isFav = false;
+  const CardItem({
+    Key? key,
+    required this.item,
+    required this.onTapCallback,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        widget.onTapCallback(widget.item);
+        onTapCallback(item);
       },
       child: Card(
         margin: EdgeInsets.only(bottom: 12.0, left: 4.0, right: 4.0),
@@ -33,10 +29,9 @@ class _CardItemState extends State<CardItem> {
               child: Stack(
                 children: [
                   Hero(
-                    tag: widget.item.id,
+                    tag: item.id,
                     child: Image.network(
-                      ApiService.pictureMediumSizeBaseUrl +
-                          widget.item.pictureId,
+                      ApiService.pictureMediumSizeBaseUrl + item.pictureId,
                       width: MediaQuery.of(context).size.width,
                     ),
                   ),
@@ -51,7 +46,7 @@ class _CardItemState extends State<CardItem> {
                           borderRadius: BorderRadius.circular(4.0)),
                       child: Center(
                           child: Text(
-                        widget.item.rating.toString(),
+                        item.rating.toString(),
                         style: TextStyle(
                             fontSize: 18.0, fontWeight: FontWeight.bold),
                       )),
@@ -71,8 +66,7 @@ class _CardItemState extends State<CardItem> {
                       child: CircleAvatar(
                         backgroundColor: darkGreen,
                         backgroundImage: NetworkImage(
-                          ApiService.pictureSmallSizeBaseUrl +
-                              widget.item.pictureId,
+                          ApiService.pictureSmallSizeBaseUrl + item.pictureId,
                         ),
                       ),
                       flex: 1),
@@ -83,7 +77,7 @@ class _CardItemState extends State<CardItem> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          widget.item.name,
+                          item.name,
                           style: TextStyle(
                             fontSize: 20.0,
                             fontWeight: FontWeight.bold,
@@ -94,7 +88,7 @@ class _CardItemState extends State<CardItem> {
                           Icon(LineIcons.mapMarker, size: 18.0),
                           SizedBox(width: 4.0),
                           Text(
-                            widget.item.city,
+                            item.city,
                             style: TextStyle(fontSize: 18.0),
                           )
                         ]),
@@ -103,16 +97,12 @@ class _CardItemState extends State<CardItem> {
                   ),
                   Expanded(
                     flex: 1,
-                    child: IconButton(
-                      onPressed: () {
-                        setState(() {
-                          _isFav = !_isFav;
-                        });
-                      },
-                      icon: Icon(
-                        _isFav ? LineIcons.heartAlt : LineIcons.heart,
-                        color: lightGreen,
-                        size: 28.0,
+                    child: Container(
+                      width: 12.0,
+                      height: 12.0,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.grey.shade400,
                       ),
                     ),
                   ),

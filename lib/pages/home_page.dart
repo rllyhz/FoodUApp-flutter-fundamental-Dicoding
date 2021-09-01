@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:restaurant_app/api/api_service.dart';
+import 'package:restaurant_app/data/api/api_service.dart';
 import 'package:restaurant_app/provider/restaurant_provider.dart';
 import 'package:restaurant_app/utils/constants.dart';
-import 'package:restaurant_app/utils/greeting_generator.dart';
+import 'package:restaurant_app/utils/generator.dart';
 import 'package:restaurant_app/utils/model_converter.dart';
 import 'package:restaurant_app/widgets/card_error.dart';
 import 'package:restaurant_app/widgets/card_item.dart';
@@ -30,35 +30,37 @@ class HomePage extends StatelessWidget {
             Text("Today's recommendations", style: TextStyle(fontSize: 18.0)),
             SizedBox(height: 12.0),
             Consumer<RestaurantProvider>(
-              builder: (ctx, provider, _) {
-                if (provider.state == ResultState.Loading) {
+              builder: (ctx, apiProvider, _) {
+                if (apiProvider.state == ResultState.Loading) {
                   return Container(
                     margin: EdgeInsets.only(top: 120.0),
                     child: LoadingFeedback(
                       text: "Preparing recommendation items for you...",
                     ),
                   );
-                } else if (provider.state == ResultState.Error) {
+                } else if (apiProvider.state == ResultState.Error) {
                   return CardError(
                     label: cardErrorLabel,
                     description: cardErrorDescription,
                   );
                 } else {
-                  final restaurants = provider.results.restaurants;
+                  final restaurants = apiProvider.results.restaurants;
                   return ListView.builder(
                     itemCount: restaurants.length,
                     shrinkWrap: true,
                     physics: ClampingScrollPhysics(),
                     itemBuilder: (ctx, index) {
+                      final currentRestaurant = restaurants[index];
                       final item =
-                          restaurantItemToRestaurantModel(restaurants[index]);
+                          restaurantItemToRestaurantModel(currentRestaurant);
 
                       return CardItem(
                         item: item,
                         onTapCallback: (restaurant) {
                           Navigator.of(context).pushNamed(
-                              DetailRestaurantPage.route,
-                              arguments: restaurant);
+                            DetailRestaurantPage.route,
+                            arguments: restaurant,
+                          );
                         },
                       );
                     },

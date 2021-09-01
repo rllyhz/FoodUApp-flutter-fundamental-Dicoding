@@ -1,148 +1,213 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:line_icons/line_icons.dart';
+import 'package:provider/provider.dart';
+import 'package:restaurant_app/pages/notification_settings_page.dart';
+import 'package:restaurant_app/provider/preferences_provider.dart';
+import 'package:restaurant_app/utils/constants.dart';
 
-class ProfilePage extends StatefulWidget {
+class ProfilePage extends StatelessWidget {
   const ProfilePage({Key? key}) : super(key: key);
 
   @override
-  _ProfilePageState createState() => _ProfilePageState();
-}
-
-class _ProfilePageState extends State<ProfilePage> {
-  int _selectedCardInfoIndex = 0;
-
-  @override
   Widget build(BuildContext context) {
-    return Container(
-      child: ListView(
-        physics: ClampingScrollPhysics(),
-        children: [
-          SizedBox(height: 32.0),
-          Center(
-            child: Container(
-              width: MediaQuery.of(context).size.width / 3,
-              height: MediaQuery.of(context).size.width / 3,
-              decoration: BoxDecoration(shape: BoxShape.circle, boxShadow: [
-                BoxShadow(
-                    offset: Offset(0, 5.0),
-                    spreadRadius: 0,
-                    blurRadius: 42.0,
-                    color: Colors.black12),
-              ]),
-              child: CircleAvatar(
-                backgroundImage: AssetImage('assets/profile_pic.jpg'),
-              ),
-            ),
-          ),
-          SizedBox(height: 42.0),
-          Text(
-            'Rully Ihza Mahendra',
-            style: TextStyle(
-              fontSize: 21.0,
-              fontWeight: FontWeight.w700,
-              color: Colors.black.withOpacity(0.7),
-            ),
-            textAlign: TextAlign.center,
-          ),
-          SizedBox(height: 8.0),
-          Text(
-            'rullyihza00@gmail.com',
-            style: TextStyle(
-                fontSize: 18.0,
-                fontWeight: FontWeight.w400,
-                color: Colors.grey),
-            textAlign: TextAlign.center,
-          ),
-          SizedBox(height: 24.0),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+    return Consumer<PreferencesProvider>(
+      builder: (ctx, provider, _) {
+        return Container(
+          child: ListView(
+            physics: ClampingScrollPhysics(),
             children: [
-              _buildCardInfoUI(
-                context,
-                0,
-                'Marked',
-                12,
-                _selectedCardInfoIndex == 0
-                    ? Colors.purple.withOpacity(0.3)
-                    : Colors.grey.shade300,
-                _selectedCardInfoIndex == 0 ? Colors.black38 : Colors.black26,
-                _selectedCardInfoIndex == 0 ? Colors.white : Colors.black,
-                _selectedCardInfoIndex == 0
-                    ? _buildSelectedShadow()
-                    : _buildUnselectedShadow(),
+              SizedBox(height: 32.0),
+              Center(
+                child: Container(
+                  width: MediaQuery.of(context).size.width / 3,
+                  height: MediaQuery.of(context).size.width / 3,
+                  decoration: BoxDecoration(shape: BoxShape.circle, boxShadow: [
+                    BoxShadow(
+                        offset: Offset(0, 5.0),
+                        spreadRadius: 0,
+                        blurRadius: 42.0,
+                        color: Colors.black12),
+                  ]),
+                  child: CircleAvatar(
+                    backgroundColor: lightGreen,
+                    backgroundImage: AssetImage('assets/profile_pic.jpg'),
+                  ),
+                ),
               ),
-              _buildCardInfoUI(
-                context,
-                1,
-                'Recipes',
-                6,
-                _selectedCardInfoIndex == 1
-                    ? Colors.purple.withOpacity(0.3)
-                    : Colors.grey.shade300,
-                _selectedCardInfoIndex == 1 ? Colors.black38 : Colors.black26,
-                _selectedCardInfoIndex == 1 ? Colors.white : Colors.black,
-                _selectedCardInfoIndex == 1
-                    ? _buildSelectedShadow()
-                    : _buildUnselectedShadow(),
+              SizedBox(height: 42.0),
+              Text(
+                'Rully Ihza Mahendra',
+                style: TextStyle(
+                  fontSize: 21.0,
+                  fontWeight: FontWeight.w700,
+                  color: Colors.black.withOpacity(0.7),
+                ),
+                textAlign: TextAlign.center,
               ),
-              _buildCardInfoUI(
-                context,
-                2,
-                'Orders',
-                22,
-                _selectedCardInfoIndex == 2
-                    ? Colors.purple.withOpacity(0.3)
-                    : Colors.grey.shade300,
-                _selectedCardInfoIndex == 2 ? Colors.black38 : Colors.black26,
-                _selectedCardInfoIndex == 2 ? Colors.white : Colors.black,
-                _selectedCardInfoIndex == 2
-                    ? _buildSelectedShadow()
-                    : _buildUnselectedShadow(),
+              SizedBox(height: 8.0),
+              Text(
+                'rullyihza00@gmail.com',
+                style: TextStyle(
+                    fontSize: 18.0,
+                    fontWeight: FontWeight.w400,
+                    color: Colors.grey),
+                textAlign: TextAlign.center,
               ),
-            ],
-          ),
-          SizedBox(height: 32.0),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: Container(
-              padding: EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12.0),
-                boxShadow: [
-                  BoxShadow(
-                    offset: Offset(0, 12.0),
-                    blurRadius: 16.0,
-                    color: Colors.black.withOpacity(0.05),
+              SizedBox(height: 24.0),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  _buildCardInfoUI(
+                    context,
+                    provider,
+                    0,
+                    'Marked',
+                    12,
+                    provider.seletedCardInfoIndex == 0
+                        ? Colors.purple.withOpacity(0.3)
+                        : Colors.grey.shade300,
+                    provider.seletedCardInfoIndex == 0
+                        ? Colors.black38
+                        : Colors.black26,
+                    provider.seletedCardInfoIndex == 0
+                        ? Colors.white
+                        : Colors.black,
+                    provider.seletedCardInfoIndex == 0
+                        ? _buildSelectedShadow()
+                        : _buildUnselectedShadow(),
+                  ),
+                  _buildCardInfoUI(
+                    context,
+                    provider,
+                    1,
+                    'Recipes',
+                    6,
+                    provider.seletedCardInfoIndex == 1
+                        ? Colors.purple.withOpacity(0.3)
+                        : Colors.grey.shade300,
+                    provider.seletedCardInfoIndex == 1
+                        ? Colors.black38
+                        : Colors.black26,
+                    provider.seletedCardInfoIndex == 1
+                        ? Colors.white
+                        : Colors.black,
+                    provider.seletedCardInfoIndex == 1
+                        ? _buildSelectedShadow()
+                        : _buildUnselectedShadow(),
+                  ),
+                  _buildCardInfoUI(
+                    context,
+                    provider,
+                    2,
+                    'Orders',
+                    22,
+                    provider.seletedCardInfoIndex == 2
+                        ? Colors.purple.withOpacity(0.3)
+                        : Colors.grey.shade300,
+                    provider.seletedCardInfoIndex == 2
+                        ? Colors.black38
+                        : Colors.black26,
+                    provider.seletedCardInfoIndex == 2
+                        ? Colors.white
+                        : Colors.black,
+                    provider.seletedCardInfoIndex == 2
+                        ? _buildSelectedShadow()
+                        : _buildUnselectedShadow(),
                   ),
                 ],
               ),
-              child: ListView(
-                physics: ClampingScrollPhysics(),
-                shrinkWrap: true,
-                children: [
-                  _buildProfileMenuItem(
-                      context, 'Username', '@rllyhz', LineIcons.user),
-                  _buildProfileMenuItem(context, 'Notifications',
-                      'Mute, Push, Email', Icons.notifications_none_outlined),
-                  _buildProfileMenuItem(context, 'Settings',
-                      'Security, Privacy', LineIcons.gripLines,
-                      isLastIndex: true),
-                ],
+              SizedBox(height: 32.0),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: Container(
+                  padding:
+                      EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12.0),
+                    boxShadow: [
+                      BoxShadow(
+                        offset: Offset(0, 12.0),
+                        blurRadius: 16.0,
+                        color: Colors.black.withOpacity(0.05),
+                      ),
+                    ],
+                  ),
+                  child: ListView(
+                    physics: ClampingScrollPhysics(),
+                    shrinkWrap: true,
+                    children: [
+                      _buildProfileMenuItem(
+                        context,
+                        'Username',
+                        '@' + provider.username,
+                        LineIcons.user,
+                        () {
+                          // show dialog
+                          _showInteractiveDialog(
+                            ctx,
+                            'Set username',
+                            'Save',
+                            () async {
+                              if (provider.inputController.text.isNotEmpty) {
+                                provider.saveUsername();
+                                Navigator.of(context, rootNavigator: true)
+                                    .pop();
+                              } else {
+                                Fluttertoast.showToast(
+                                  msg: 'The field should not be empty!',
+                                );
+                              }
+                            },
+                            TextField(
+                              controller: provider.inputController,
+                              decoration: InputDecoration(
+                                hintText: 'Username',
+                                contentPadding:
+                                    EdgeInsets.symmetric(horizontal: 8.0),
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                      _buildProfileMenuItem(
+                        ctx,
+                        'Notifications',
+                        'Daily Notifications',
+                        Icons.notifications_none_outlined,
+                        () {
+                          Navigator.of(context)
+                              .pushNamed(NotificationSettingsPage.route);
+                        },
+                      ),
+                      _buildProfileMenuItem(
+                        ctx,
+                        'Settings',
+                        'Security, Privacy',
+                        LineIcons.gripLines,
+                        () {
+                          Fluttertoast.showToast(msg: "Not implemented yet!");
+                        },
+                        isLastIndex: true,
+                      ),
+                    ],
+                  ),
+                ),
               ),
-            ),
+              SizedBox(height: 24.0),
+            ],
           ),
-          SizedBox(height: 24.0),
-        ],
-      ),
+        );
+      },
     );
   }
 
-  Widget _buildProfileMenuItem(
-      BuildContext context, String title, String description, IconData iconData,
+  Widget _buildProfileMenuItem(BuildContext context, String title,
+      String description, IconData iconData, Function() onTap,
       {bool isLastIndex = false}) {
     return GestureDetector(
-      onTap: () {},
+      onTap: onTap,
       child: Container(
         padding: EdgeInsets.symmetric(vertical: 24.0),
         margin: !isLastIndex ? EdgeInsets.only(bottom: 12.0) : null,
@@ -215,6 +280,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
   Widget _buildCardInfoUI(
       BuildContext context,
+      PreferencesProvider provider,
       int index,
       String label,
       int total,
@@ -224,9 +290,7 @@ class _ProfilePageState extends State<ProfilePage> {
       BoxShadow shadow) {
     return GestureDetector(
       onTap: () {
-        setState(() {
-          _selectedCardInfoIndex = index;
-        });
+        provider.setSelectedCardInfoIndex(index);
       },
       child: Container(
         width: (MediaQuery.of(context).size.width / 4) - 8.0,
@@ -255,6 +319,63 @@ class _ProfilePageState extends State<ProfilePage> {
           ],
         ),
       ),
+    );
+  }
+
+  void _showInteractiveDialog(
+    BuildContext context,
+    String title,
+    String actionButtonPositiveText,
+    void Function()? onButtonPositiveClick,
+    Widget inputWidget,
+  ) {
+    showDialog(
+      context: context,
+      builder: (ctx) {
+        return Dialog(
+          child: Container(
+            height: 194.0,
+            padding: const EdgeInsets.all(18.0),
+            child: Column(
+              children: [
+                Text(
+                  title,
+                  style: Theme.of(context).textTheme.headline6?.copyWith(
+                        fontSize: 18.0,
+                        fontWeight: FontWeight.bold,
+                      ),
+                ),
+                SizedBox(height: 18.0),
+                inputWidget,
+                SizedBox(height: 12.0),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.of(context, rootNavigator: true).pop();
+                      },
+                      child: Text('Cancel'),
+                      style: ElevatedButton.styleFrom(
+                        primary: Colors.grey.shade400,
+                        onPrimary: Colors.black,
+                      ),
+                    ),
+                    SizedBox(width: 12.0),
+                    ElevatedButton(
+                      onPressed: onButtonPositiveClick,
+                      child: Text(actionButtonPositiveText),
+                      style: ElevatedButton.styleFrom(
+                        primary: darkGreen,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }
